@@ -517,6 +517,8 @@ aic_values %>%
 
 We used AIC to compared different ARIMA model, based on the table ARIMA(2,0,2) have the lowest AIC and based on the tsdiag shown below, the model has captured all of the autocorrelation pattern and leave the white noise on the residual. Hence, it perform as an adequate model for this particular time series.
 
+In order to interpret the model we extract the coefficient of the ARMA(2.0,2)
+
 ```{r}
 # Extract the coefficient of ARMA(2,0,2)
 summary(arma_202_model_seriesA)
@@ -659,6 +661,15 @@ series_B_aic_values %>%
 #### Model Selection
 
 Similar to Series A,, we used AIC to compared different ARIMA model. Based on the table ARIMA(0,0,2) have the lowest AIC which was also chosen by the Auto Arima. The ARMA(0,0,2) tsdiag also shown the model has captured all of the autocorrelation with the very high Ljung - Box test p-value . Therefore, we choose ARMA(0,0,2) as an adequate model for this time series.
+
+In order to interpret the model more detail we extract the coefficient of the ARMA(0,0,2)
+
+```{r}
+# Extract the coefficient of ARMA(0,0,2) model 
+summary(arma_002_model_seriesB)
+```
+
+The ARMA(0,0,2) model for series B indicates that the current value is influenced by the errors from the previous two periods. The MA1 coefficient (0.5061) shows a moderate positive impact from the error at lag 1, meaning that a positive error in the previous step increases the current value. The MA2 coefficient (-0.0997) indicates a weaker, slightly negative influence from the error at lag 2, but its effect is minimal. The small positive mean (0.0613) suggests the series fluctuates around a slightly positive level. With low AIC (682.75) and RMSE (0.9861), the model appears to fit the data well, capturing the key dynamics of the time series effectively.
 
 ### C. Identify ARMA Series C
 
