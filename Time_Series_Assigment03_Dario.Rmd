@@ -144,7 +144,7 @@ Assuming that the standard threshold of 0.05 is used, the p-values are below thi
 pacf(data$Series.A, main = "PACF of Series A")
 ```
 
-Comment: According to the PACF plot for Series A, the partial autocorrelations at lags 1, 2, and 4 are significantly different from zero at the 5% significance level. The PACF values sharply decrease after lag 4, indicating that the PACF cuts off at this point. Therefore, an AR(4) model may be appropriate for this series, as it suggests that the data has significant autocorrelation up to the fourth lag.
+Comment: According to the PACF plot for Series A, the partial autocorrelations at lags 1, 2, and 4 are significantly different from zero at the 5% significance level. The PACF values sharply decrease after lag 4, indicating that the PACF cuts off at this point. Therefore, an AR(4) model may be appropriate for this series, as it suggests that the data has significant autocorrelation up to the fourth lag. Alternatively, an AR(1) or AR(2) model may also be a good fit.
 
 ```{r}
 # Fit the AR(4) model to time series
@@ -154,7 +154,7 @@ ar_series_A <- Arima(data$Series.A, order = c(4, 0, 0))
 tsdiag(ar_series_A)
 ```
 
-**Standardized Residuals**: This plot display residuals that fluctuate randomly around zero with no obvious patterns or trends. In our model, the residuals appear to fluctuate randomly around zero, with no significant patterns, trends, or autocorrelation evident. In overall, the residual are well - behaved which suggests that the AR(4) model is capturing most of the structure of time series data.
+**Standardized Residuals**: This plot display residuals that fluctuate randomly around zero with no obvious patterns or trends. In our model, the residuals appear to fluctuate randomly around zero, with no significant patterns, trends, or autocorrelation evident. Overall, the residuals are well-behaved which suggests that the AR(4) model is capturing most of the structure of time series data. It is possible that AR(1), AR(2), or AR(3) could also work.
 
 **ACF of Residuals:** The autocorrelation of residuals shows no significant spikes, as all lags fall within the confidence bounds. This is a good sign, indicating that the residuals do not have significant autocorrelation and are close to white noise. It means the model has adequately captured the time-dependent structure of the series.
 
@@ -190,7 +190,7 @@ tsdiag(ar_series_B)
 pacf(data$Series.C, main = "PACF of Series C")
 ```
 
-**Comment:** According to the PACF plot for Series C, the partial autocorrelations at lags 1, 2, 3, and 4 are significantly different from zero at the 5% significance level. While there are significant values at lags 7 and 12, these may be due to noise or randomness rather than meaningful patterns. The PACF shows a general decrease after lag 4, which suggests that an AR(4) model could capture the main structure of the data without making the model overly complex. Therefore, we choose an AR(4) model as it provides a balance between model complexity and fit, with the main cut-off occurring at lag 4.
+**Comment:** According to the PACF plot for Series C, the partial autocorrelations at lags 1, 2, 3, and 4 are significantly different from zero at the 5% significance level. While there are marginally under-significant values at lags 7, 12, and 17. However these may be due to noise or randomness rather than meaningful patterns. The PACF shows a general decrease after lag 4, which suggests that an AR(4) model could capture the main structure of the data without making the model overly complex. Therefore, we choose an AR(4) model as it provides a balance between model complexity and fit, with the main cut-off occurring at lag 4.
 
 ```{r}
 # Fit the AR(4) model to time series C
@@ -200,7 +200,7 @@ ar_series_C <- Arima(data$Series.C, order = c(4, 0, 0))
 tsdiag(ar_series_C)
 ```
 
-**Standardized Residuals:** The residuals appear to fluctuate randomly around zero, with no clear trends or patterns. Based on the plot, there are few larger spike after time 200, but in overall, the residuals are well behaved suggesting that the AR(4) model can captured the main structure of the series.
+**Standardized Residuals:** The residuals appear to fluctuate randomly around zero, with no clear trends or patterns. Based on the plot, there are few larger spike after time 200, but overall, the residuals are well behaved suggesting that the AR(4) model can captured the main structure of the series.
 
 **ACF of Residuals:** The ACF plot shows no significant spikes beyond the first lag, with all values falling within the confidence bounds. This indicates that the residuals are not correlated, which is a good sign that the model has appropriately captured the autocorrelations in the data.
 
@@ -213,7 +213,7 @@ tsdiag(ar_series_C)
 pacf(data$Series.D, main = "PACF of Series D")
 ```
 
-Comment: According to the PACF plot for Series D, the partial autocorrelations at lags 1, 2, 3, and 6 are significantly different from zero at the 5% significance level. While there are significant values at lags 19 these may be due to noise or randomness. The PACF shows a general decrease after lag 6, which suggests that an AR(6) model could capture the main structure of the data without making the model overly complex. Therefore, we choose an AR(6) model.
+Comment: According to the PACF plot for Series D, the partial autocorrelations at lags 1, 2, 3, and 6 are significantly different from zero at the 5% significance level. There is a marginally significant value at lag 19, which may be due to noise or randomness. The PACF shows a general decrease after lag 6, which suggests that an AR(6) model could capture the main structure of the data without making the model overly complex. Therefore, we choose an AR(6) model.
 
 ```{r}
 # Fit the AR(4) model to time series C
@@ -223,7 +223,7 @@ ar_series_D <- Arima(data$Series.D, order = c(6, 0, 0))
 tsdiag(ar_series_D)
 ```
 
-**Standardized Residuals:** The residuals appear to fluctuate randomly around zero, which is a good sign. There are no clear trends or patterns, indicating that the AR(6) model has adequately the structure of the time series. Based on the plot, there are few large spike at the end of plot but they do not indicate any systemic issues to the model.
+**Standardized Residuals:** The residuals appear to fluctuate randomly around zero, which is a good sign. There are no clear trends or patterns, indicating that the AR(6) model has adequately captured the structure of the time series. Based on the plot, there are few large spike at the end of plot but they do not indicate any systemic issues to the model.
 
 **ACF of Residuals:** The ACF plot of residuals shows no significant autocorrelation with all values falling within the confidence bounds. Hence, the residuals do no exhibit any autocorrelation, it suggests that there are no information left in the residuals that the model has not accounted for.
 
