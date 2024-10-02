@@ -1,0 +1,963 @@
+---
+title: "Time_Series_Assignment_03"
+output: html_document
+date: "2024-09-26"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r, include = FALSE}
+# Load necessary library 
+library(ggplot2)
+library(tseries)
+library(forecast)
+library(gridExtra)
+library(quantmod)
+library(kableExtra)
+```
+
+**Ljung-Box Test Interpretation:**
+
+**If the point above the line:** We fail to reject the null hypothesis that there is no autocorrelation in the residuals.
+
+**If the point below the line:** we reject the null hypothesis that there is no autocorrelation in the residuals, indicating that there is significant autocorrelation in the residuals at these lags.
+
+## Question 01
+
+```{r}
+# Read the time series data
+data <- read.csv("A3Data.csv")
+```
+
+### A. Show a time series plot and comment on the features
+
+#### 1. Plot for Series A
+
+```{r}
+series_a <- ggplot(data, aes(x = 1:nrow(data), y = Series.A)) +
+  geom_line() +
+  ggtitle("Time Series Plot for Series A") +
+  xlab("Index") +
+  ylab("Values") +
+  theme(plot.title = element_text(hjust = 0.5, size = 16))
+
+# show the result 
+series_a
+```
+
+Comment on the feature:
+
+When we first look at the time series plot for `Series A`, we see that it moves up and down in a repeating pattern, indicating some kind of cyclical behavior. The size of the ups and downs (amplitude) changes over time, becoming larger and smaller at different points. There's no clear trend going up or down overall; it seems to fluctuate around zero. The changes in the series happen quite frequently, showing high variability in a short period of time.
+
+#### 2. Plot for Series B
+
+```{r}
+# Plot for Series B
+series_b <- ggplot(data, aes(x = 1:nrow(data), y = Series.B)) +
+  geom_line() +
+  ggtitle("Time Series Plot for Series B") +
+  xlab("Index") +
+  ylab("Values") + 
+  theme(plot.title = element_text(hjust =0.5, size = 16))
+
+# show the plot
+series_b
+```
+
+Comment on the feature:
+
+The time series plot for `Series B` shows a similar oscillating pattern to `Series A`, with values moving above and below zero. However, the fluctuations in `Series B` seem less regular and more erratic. The amplitude of the series still varies over time, with some larger spikes and dips occurring occasionally, but overall the series does not show a consistent increasing or decreasing trend. The oscillations appear some random in size and timing, indicating high variability
+
+#### 3. Plot for Series C
+
+```{r}
+# Plot for Series C
+series_c <-  ggplot(data, aes(x = 1:nrow(data), y = Series.C)) +
+  geom_line() +
+  ggtitle("Time Series Plot for Series C") +
+  xlab("Index") +
+  ylab("Values") +
+  theme(plot.title = element_text(hjust = 0.5, size = 16))
+
+# show the result 
+series_c
+```
+
+Comment on the feature:
+
+The time series plot for `Series C` displays a similar oscillating pattern as seen in the previous series, but with more pronounced fluctuations. The values oscillate around zero, with some noticeable larger spikes and dips. One feature that stands out is the large dip towards the right side of the plot, which indicates an outlier or a significant drop in the values. The amplitude of the oscillations is not constant, varying throughout the plot. There doesn’t appear to be any clear trend over time, and the oscillations seem irregular, suggesting random variability with occasional extreme values. Further investigation could help determine whether the extreme values represent anomalies or part of a natural pattern.
+
+#### 4. Plot for Series D
+
+```{r}
+# Plot for Series D
+series_d <- ggplot(data, aes(x = 1:nrow(data), y = Series.D)) +
+  geom_line() +
+  ggtitle("Time Series Plot for Series D") +
+  xlab("Index") +
+  ylab("Values") +
+  theme(plot.title = element_text(hjust = 0.5, size = 16))
+
+# show the result 
+series_d
+```
+
+Comment on the feature:
+
+The time series plot for `Series D` shows an oscillating pattern similar to the previous series, with values fluctuating around zero. One notable feature is that the amplitude of the oscillations varies over time, with more prominent peaks and troughs towards the middle and end of the plot. The series does not exhibit any clear upward or downward trend and remains centered around zero, indicating it may be stationary. The fluctuations appear somewhat more irregular than in some of the other series, with no consistent pattern in the timing of the peaks and troughs. There is a slight tendency for larger downward fluctuations towards the end of the series.
+
+### B. Use the PACF to identify AR model, illustrate the reasons of your choice and evaluate the goodness of your model through the `tsdiag` function
+
+**Ljung-Box Test Interpretation:**
+
+**If the point above the line:** We fail to reject the null hypothesis that there is no autocorrelation in the residuals.
+
+**If the point below the line:** We reject the null hypothesis, indicating that there is significant autocorrelation in the residuals at these lag.
+
+#### 1. Checking data stationary
+
+First, before we plot the PACF to identify the AR model, we have to check the stationary of each series.
+
+Therefore, we will check the stationary of each dataset using `ADF` test
+
+```{r}
+# Check stationarity using Augmented Dickey-Fuller (ADF) test
+suppressWarnings(adf.test(data$Series.A))
+suppressWarnings(adf.test(data$Series.B))
+suppressWarnings(adf.test(data$Series.C))
+suppressWarnings(adf.test(data$Series.D))
+```
+
+The p-value is below a certain threshold (usually 0.05), the series is considered stationary. Therefore, we can perform the PACF.
+
+#### 2. PACF for Series A
+
+```{r}
+# Plot PACF for Series A
+pacf(data$Series.A, main = "PACF of Series A")
+```
+
+Comment: According to the PACF plot for Series A, the partial autocorrelations at lags 1, 2, and 4 are significantly different from zero at the 5% significance level. The PACF values sharply decrease after lag 4, indicating that the PACF cuts off at this point. Therefore, an AR(4) model may be appropriate for this series, as it suggests that the data has significant autocorrelation up to the fourth lag.
+
+```{r}
+# Fit the AR(4) model to time series
+ar_series_A <- Arima(data$Series.A, order = c(4, 0, 0))
+
+# Perform diagnostics using tsdiag
+tsdiag(ar_series_A)
+```
+
+**Standardized Residuals**: This plot display residuals that fluctuate randomly around zero with no obvious patterns or trends. In our model, the residuals appear to fluctuate randomly around zero, with no significant patterns, trends, or autocorrelation evident. In overall, the residual are well - behaved which suggests that the AR(4) model is capturing most of the structure of time series data.
+
+**ACF of Residuals:** The autocorrelation of residuals shows no significant spikes, as all lags fall within the confidence bounds. This is a good sign, indicating that the residuals do not have significant autocorrelation and are close to white noise. It means the model has adequately captured the time-dependent structure of the series.
+
+**Ljung - Box p - values:** The p-values for the Ljung-Box test are consistently above the 0.05 threshold for all lags. We fail to reject the null hypothesis that there is no autocorrelation in the residuals.
+
+#### 3. PACF for Series B
+
+```{r}
+# Plot PACF for Series A
+pacf(data$Series.B, main = "PACF of Series B")
+```
+
+**Comment**: According to the PACF plot for Series B, the partial autocorrelations at lags 1, 2, 3 and 4 are significantly different from zero at the 5% significance level. The PACF values decrease after lag 4, indicating that the PACF cuts off at this point. Therefore, an AR(4) model may be appropriate for this series.
+
+```{r}
+# Fit the AR(4) model to time series B
+ar_series_B <- Arima(data$Series.B, order = c(4, 0, 0))
+
+# Perform diagnostics using tsdiag
+tsdiag(ar_series_B)
+```
+
+**Standardized Residuals:** The residuals appear random, with fluctuations around zero. There are no clear patterns, trends, which indicates that the AR(4) model has captured much of the structure of the time series.
+
+**ACF of Residuals:** The ACF plot shows no significant spikes beyond the first lag, with all values falling within the confidence bounds. This means that the residuals have no autocorrelation, which suggests the model is appropriately capturing the underlying process.
+
+**Ljung - Box p - values:** The p-values for the Ljung-Box test are above 0.05. This indicates we fail to reject the null hypothesis that there is no autocorrelation in the residuals.
+
+#### 4. PACF for Series C
+
+```{r}
+# Plot PACF for Series C
+pacf(data$Series.C, main = "PACF of Series C")
+```
+
+**Comment:** According to the PACF plot for Series C, the partial autocorrelations at lags 1, 2, 3, and 4 are significantly different from zero at the 5% significance level. While there are significant values at lags 7 and 12, these may be due to noise or randomness rather than meaningful patterns. The PACF shows a general decrease after lag 4, which suggests that an AR(4) model could capture the main structure of the data without making the model overly complex. Therefore, we choose an AR(4) model as it provides a balance between model complexity and fit, with the main cut-off occurring at lag 4.
+
+```{r}
+# Fit the AR(4) model to time series C
+ar_series_C <- Arima(data$Series.C, order = c(4, 0, 0))
+
+# Perform diagnostics using tsdiag
+tsdiag(ar_series_C)
+```
+
+**Standardized Residuals:** The residuals appear to fluctuate randomly around zero, with no clear trends or patterns. Based on the plot, there are few larger spike after time 200, but in overall, the residuals are well behaved suggesting that the AR(4) model can captured the main structure of the series.
+
+**ACF of Residuals:** The ACF plot shows no significant spikes beyond the first lag, with all values falling within the confidence bounds. This indicates that the residuals are not correlated, which is a good sign that the model has appropriately captured the autocorrelations in the data.
+
+**Ljung - Box p - values:** The p-values for the Ljung-Box test are consistently above 0.05 for all lags. Therefore, we fail to reject the null hypothesis that there is no autocorrelation in the residuals.
+
+#### 5. PACF for Series D
+
+```{r}
+# Plot PACF for Series D
+pacf(data$Series.D, main = "PACF of Series D")
+```
+
+Comment: According to the PACF plot for Series D, the partial autocorrelations at lags 1, 2, 3, and 6 are significantly different from zero at the 5% significance level. While there are significant values at lags 19 these may be due to noise or randomness. The PACF shows a general decrease after lag 6, which suggests that an AR(6) model could capture the main structure of the data without making the model overly complex. Therefore, we choose an AR(6) model.
+
+```{r}
+# Fit the AR(4) model to time series C
+ar_series_D <- Arima(data$Series.D, order = c(6, 0, 0))
+
+# Perform diagnostics using tsdiag
+tsdiag(ar_series_D)
+```
+
+**Standardized Residuals:** The residuals appear to fluctuate randomly around zero, which is a good sign. There are no clear trends or patterns, indicating that the AR(6) model has adequately the structure of the time series. Based on the plot, there are few large spike at the end of plot but they do not indicate any systemic issues to the model.
+
+**ACF of Residuals:** The ACF plot of residuals shows no significant autocorrelation with all values falling within the confidence bounds. Hence, the residuals do no exhibit any autocorrelation, it suggests that there are no information left in the residuals that the model has not accounted for.
+
+**Ljung - Box p - values:** The p-values for the Ljung-Box test are consistently above the 0.05 threshold. As a result, we fail to reject the null hypothesis that there is no autocorrelation in the residuals.
+
+### C. Use the ACF to identify MA model, illustrate the reasons of your choice and evaluate the goodness of your model through the `tsdiag` function
+
+#### 1. ACF for Series A
+
+```{r}
+# Plot PACF for Series A
+acf(data$Series.A, main = "ACF of Series A")
+```
+
+Based on the ACF plot for Series A, the autocorrelations at lags 1 to 8 are significantly different from zero at the 5% significance level. After lag 8, the ACF values drop close to zero, suggesting that the autocorrelations are no longer significant. This cut-off behaviour after lag 8 indicates that an MA(8) model could be appropriate for this series, as the moving average process is likely to extend up to 8 lags.
+
+```{r}
+# Fit the MA(8) model to time series A
+ma_series_A <- Arima(data$Series.A, order = c(0, 0, 8))
+
+# Perform diagnostics using tsdiag
+tsdiag(ma_series_A)
+```
+
+**Standardized Residuals:** The residuals fluctuate randomly around zero with no clear patterns or trends which is a good sign. The model appears to have captured the key features of the time series as the residuals bahave like white noise. Hence, the MA(8) model has successfully captured the volatility in the data.
+
+**ACF of Residuals:** The ACF plot shows no significant autocorrelations as all values fall within the confidence bounds. This suggest that the residuals do not exhibit autocorrelation where model has successfully captured the autocorrelations in the data.
+
+**Ljung - Box p - values:** The p-values for the Ljung-Box test are consistently above 0.05 for all lags. This confirm we fail to reject the null hypothesis that there is no autocorrelation in the residuals.
+
+Based on the diagnostic check, the MA(8) model seems to be a good fit for Series A.
+
+#### 2. ACF for Series B
+
+```{r}
+# Plot PACF for Series B
+acf(data$Series.B, main = "ACF of Series B")
+```
+
+Based on the ACF plot or series B, the autocorrelations at lags 1 are significantly different from zero at the 5% significance level. The ACF cut off at lag 1 indicate no further significant value until lag 8, however, these may be due to noise or randomness. Hence, The sharp cut-off in the ACF at lag 1 suggests that an MA(1) model could adequately capture the main structure of the data without adding unnecessary complexity. Therefore, an MA(1) model might appropriate for this series.
+
+```{r}
+# Fit the MA(1) model to time series B
+ma_series_B <- Arima(data$Series.B, order = c(0, 0, 1))
+
+# Perform diagnostics using tsdiag
+tsdiag(ma_series_B)
+```
+
+**Standardized Residuals:** The residuals fluctuate randomly around zero, with no obvious patterns or trends. This indicates the the MA(1) model has captured the main structure of the time series.
+
+**ACF of Residuals:** The ACF plot shows no significant autocorrelations as all values fall within the confidence bounds. The absence of significant spikes confirms that there is no remaining autocorrelation in the residuals, which means that the model has effectively captured the temporal structure of the data.
+
+**Ljung - Box p - values:** The p-values for the Ljung-Box test are consistently above 0.05 for all lags, which indicates we fail to reject the null hypothesis that there is no autocorrelation in the residuals.
+
+Based on the diagnostic check, the MA(1) model seems to be a good fit for Series B.
+
+#### 3. ACF for Series C
+
+```{r}
+# Plot PACF for Series C
+acf(data$Series.C, main = "ACF of Series C")
+```
+
+Comment: There is a significant spike at lag 1 that exceeds the confidence bounds, indicating that there is strong autocorrelation at this lag. After lag 1, the autocorrelation values quickly diminish, with subsequent lags mostly within the confidence bounds. The small and insignificant autocorrelation values at lag 8 and lag 13, suggest that there might be some white noise. Hence, the ACF shows a sharp cut - off at lag 1, this suggest the MA(1) is likely appropriate
+
+```{r}
+# Fit the MA(2) model to time series D
+ma_series_C <- Arima(data$Series.C, order = c(0, 0, 1))
+
+# Perform diagnostics using tsdiag
+tsdiag(ma_series_C)
+```
+
+**Standardized Residuals:**
+
+**ACF of Residuals:** The autocorrelation values are mostly within the confidence bounds. This suggests that most of the autocorrelation has been captured by the model.
+
+**Ljung - Box p - values:** The p-values are all above the 0.05 threshold for all lags, there are a few lags show slightly lower p-values (closer to the 0.05 mark), but they are still above the threshold. As a result, we fail to reject the null hypothesis that there is no autocorrelation in the residuals.
+
+Based on the diagnostic check, the MA(1) model seems to be a good fit for Series C.
+
+#### 4. ACF for Series D
+
+```{r}
+# Plot PACF for Series D
+acf(data$Series.D, main = "ACF of Series D")
+```
+
+Comment: According to the ACF plot for time series D, the autocorrelations at lags 1 and 2 are significantly different from zero at the 5% significance level. After lag 2, the ACF values drop close to zero, indicating no significant autocorrelation at further lags. While there are some minor spikes at lags 6, 17, and 18, these are likely due to noise or randomness in the data and do not suggest any meaningful structure. The sharp cut-off in the ACF after lag 2 suggests that an MA(2) model is appropriate for this series, as it can capture the main structure of the data.
+
+```{r}
+# Fit the MA(2) model to time series D
+ma_series_D <- Arima(data$Series.D, order = c(0, 0, 2))
+
+# Perform diagnostics using tsdiag
+tsdiag(ma_series_D)
+```
+
+**Standardized Residuals:** The residuals fluctuate randomly around zero, there are a few spikes in the residuals between time 100 and 150 but they do not follow any consistent pattern this indicate no clear patterns or trends (random). Hence, this indicates that the MA(2) model has adequately captured the structure of the time series
+
+**ACF of Residuals:** The ACF plot shows no significant autocorrelations remaining, as all values fall within the confidence bounds. While there are small spikes at lags 6 and 18, these values remain within the confidence limits and likely result from random fluctuations or noise. They are unlikely to affect the model significantly but are worth noting for potential further investigation.
+
+**Ljung - Box p - values:** The p-values are mostly above the 0.05 threshold for all lags, there are a few lags show slightly lower p-values (closer to the 0.05 mark), but they are still above the threshold. Therefore, we fail to reject the null hypothesis that there is no autocorrelation in the residuals.
+
+Based on the diagnostic check, the MA(2) model seems to be a good fit for Series D.
+
+## Question 02
+
+### A. Identify ARMA Series A
+
+#### A.1 Try with ARMA(1,0,0) model
+
+```{r}
+# Fit the model with AR(1)
+arma_100_model_seriesA <- Arima(data$Series.A, order = c(1, 0, 0))
+
+# Evaluate the model 
+tsdiag(arma_100_model_seriesA)
+```
+
+**Standardized Residuals:** The residuals appear to fluctuate around zero, which is generally what we expect from a well-fitted model.
+
+**ACF of Residuals:** The ACF plot shows no significant autocorrelations remaining, as all values fall within the confidence bounds. While there are small spikes at lags 2, 3 and 9, these values remain within the confidence limits and likely result from random noise.
+
+**Ljung - Box p - values:** According to the p values for Lijung - Box statistic, most of p-values at certain lags (1,3,5,7,9,10) fall below the 0.05 significant level. This means that we reject the null hypothesis that there is no autocorrelation in the residuals, indicating that there is significant autocorrelation in the residuals at these lags.
+
+As a result, ARMA(1,0,0) may not fully capture the underlying autocorrelation structure of the time series indicate this is not a best fit model for this series.
+
+#### A.2 Try with ARMA(2,0,0) model
+
+```{r}
+# Fit the model with ARMA(2,0,0)
+arma_200_model_seriesA <- Arima(data$Series.A, order = c(2, 0, 0))
+
+# Evaluate the model 
+tsdiag(arma_200_model_seriesA)
+```
+
+**Standardized Residuals:** The residuals appear to fluctuate around zero, which is generally what we expect from a well-fitted model.
+
+**ACF of Residuals:** The ACF plot shows no significant autocorrelations remaining, as all values fall within the confidence bounds. While there are small spikes at lags 9 that might be some autocorrelation there which the model did not capture.
+
+**Ljung - Box p - values:** According to the p values for Lijung - Box statistic, all of p-value above the 0.05 significant level. This mean we fail to reject the null hypothesis that there is no autocorrelation in the residuals. However, there is a noticeable at the p -value at lag 9 is just slightly above the significant level, it might be useful to further investigate or might fit the model include lag 9 to compare the result.
+
+As a result, this model might fit well to the data but some notice at lag 9 might be need to further investigate.
+
+#### A.3 Try with ARMA(1,0,1) model
+
+```{r}
+# Fit the model with AR(1)
+arma_101_model_seriesA <- Arima(data$Series.A, order = c(1, 0, 1))
+
+# Evaluate the model 
+tsdiag(arma_101_model_seriesA)
+```
+
+**Standardized Residuals:** The residuals are centered around zero with no visible patterns, which indicates that the ARMA(1,0,1) model has effectively captured the major structure of the data.
+
+**ACF of Residuals:** The ACF plot shows no significant autocorrelations remaining, as all values fall within the confidence bounds. While there are small spikes at lags 9 that might be some autocorrelation there which the model did not capture.
+
+**Ljung - Box p - values:** The p - values at lag 9 is lay on the significant bound. Therefore, we reject the null hypothesis that there is no autocorrelation in the residuals, indicating that there is significant autocorrelation in the residuals at this lag.
+
+Therefore, ARMA(1,0,1) is not an adequate model for this time series since not capture all pattern of data.
+
+#### A.4 Try with ARMA(1,0,2) model
+
+```{r}
+# Fit the model with AR(1,0,2)
+arma_102_model_seriesA <- Arima(data$Series.A, order = c(1, 0, 2))
+
+# Evaluate the model 
+tsdiag(arma_102_model_seriesA)
+```
+
+**Standardized Residuals:** The residuals are centered around zero with no visible patterns, which indicates that the ARMA(1,0,1) model has effectively captured the major structure of the data.
+
+**ACF of Residuals:** The ACF plot shows no significant autocorrelations remaining, as all values fall within the confidence bounds. While there are small spikes at lags 9 which likely result from random noise.
+
+**Ljung - Box p - values:** The p-values for the Ljung-Box test are consistently above 0.05 for all lags, which indicates that there is no significant autocorrelation remaining in the residuals. It suggest we fail to reject the null hypothesis that there is no autocorrelation in the residuals.
+
+Therefore, ARMA(1,0,2) is represented as an adequate model for this series.
+
+#### A.5 Try with ARMA(0,0,1) model
+
+```{r}
+# Fit the model with AR(0,0,1)
+arma_001_model_seriesA <- Arima(data$Series.A, order = c(0, 0, 1))
+
+# Evaluate the model 
+tsdiag(arma_001_model_seriesA)
+```
+
+**Standardized Residuals:** The residuals are centered around zero with no visible patterns, look like the good sign of the model fit well.
+
+**ACF of Residuals:** however, there is a noticeable spike at lags 1 to 5 that falls outside the confidence bounds, indicating there are some autocorrelation in the residuals where the model cannot capture.
+
+**Ljung - Box p - values:** all the p-values are below 0.05 indicates that we reject the null hypothesis that there is no autocorrelation in the residuals, there is significant autocorrelation in the residuals at these lags.
+
+The ARMA(0,0,1) model is not a good fit for this time series, as there is still significant autocorrelation in the residuals which the model cannot capture.
+
+#### A.6 Try with ARMA(0,0,2) model
+
+```{r}
+# Fit the model with AR(0,0,2)
+arma_002_model_seriesA <- Arima(data$Series.A, order = c(0, 0, 2))
+
+# Evaluate the model 
+tsdiag(arma_002_model_seriesA)
+```
+
+**Standardized Residuals:** the residuals fluctuate randomly around zero with no clear patterns or trends which is a good sign indicate that model has captured some structure of data. However, the variability appears relatively consistent which suggest that the model may no have fully captured all underlying dynamic data.
+
+**ACF of Residuals:** there is a noticeable spike at lags 1, 2, 3 and 5 that falls outside the confidence bounds, indicating that some autocorrelation remains in the residuals.
+
+**Ljung - Box p - values:** all the p-values are below 0.05 indicates that we reject the null hypothesis that there is no autocorrelation in the residuals, there is significant autocorrelation in the residuals at these lags.
+
+The ARMA(0,0,2) model is not a good fit for this time series, as there is still significant autocorrelation in the residuals which the model cannot capture.
+
+#### A.7 Try with ARMA(2,0,1) model
+
+```{r}
+# Fit the model with AR(2,0,1)
+arma_201_model_seriesA <- Arima(data$Series.A, order = c(2, 0, 1))
+
+# Evaluate the model 
+tsdiag(arma_201_model_seriesA)
+```
+
+**Standardized Residuals:** The residuals fluctuate randomly around zero with no clear patterns or trends which is a good sign indicate that model has captured structure of data.
+
+**ACF of Residuals:** The ACF plot shows no significant autocorrelations remaining, as all values fall within the confidence bounds. However, there are small spikes at lags 9 indicate the model not fully capture all autocorrelation
+
+**Ljung - Box p - values:** The p-values for the Ljung-Box test are consistently above 0.05 for all lags, Therefore, we fail to reject the null hypothesis that there is no autocorrelation in the residuals.
+
+This suggest that the ARMA(2,0,1) is an adequate model for this series but the p values at lag 9 just slightly above the line, hence, ARMA(2,0,2) might get a better result in this case.
+
+#### A.8 Try with ARMA(2,0,2) model
+
+```{r}
+# Fit the model with AR(2,0,1)
+arma_202_model_seriesA <- Arima(data$Series.A, order = c(2, 0, 2))
+
+# Evaluate the model 
+tsdiag(arma_202_model_seriesA)
+```
+
+**Standardized Residuals:** The residuals fluctuate randomly around zero with no clear patterns or trends which is a good sign indicate that model has captured structure of data.
+
+**ACF of Residuals:** The ACF plot shows no significant autocorrelations as all values fall within the confidence bounds. The reduction in autocorrelation at lag 9 compared to the previous model suggests that the current model captures more of the temporal structure in the data.
+
+**Ljung - Box p - values:** The p-values for the Ljung-Box test are consistently above 0.05 for all lags, which indicates that we fail to reject the null hypothesis that there is no autocorrelation in the residuals.
+
+As a result, ARMA(2,0,2) seem to be an adequate model for this series.
+
+#### A.9 Try with Auto ARIMA
+
+```{r}
+# Compare with auto.arima
+auto_arima_seriesA <- auto.arima(data$Series.A)
+
+# show the result 
+auto_arima_seriesA
+```
+
+#### Model Selection
+
+```{r}
+# Compare the AIC from each model 
+aic_arma100_seriesA <- arma_100_model_seriesA$aic 
+aic_arma200_seriesA <- arma_200_model_seriesA$aic 
+aic_arma101_seriesA <- arma_101_model_seriesA$aic
+aic_arma102_seriesA <- arma_102_model_seriesA$aic
+aic_arma001_seriesA <- arma_001_model_seriesA$aic
+aic_arma002_seriesA <- arma_002_model_seriesA$aic
+aic_arma201_seriesA <- arma_201_model_seriesA$aic
+aic_arma202_seriesA <- arma_202_model_seriesA$aic
+```
+
+```{r}
+# Create a data frame for the AIC values
+aic_values <- data.frame(
+  Model = c("ARMA(1,0,0)", "ARMA(2,0,0)", "ARMA(1,0,1)", "ARMA(1,0,2)", 
+            "ARMA(0,0,1)", "ARMA(0,0,2)", "ARMA(2,0,1)", "ARMA(2,0,2)"),
+  AIC = c(aic_arma100_seriesA, aic_arma200_seriesA, aic_arma101_seriesA, 
+          aic_arma102_seriesA, aic_arma001_seriesA, aic_arma002_seriesA,
+          aic_arma201_seriesA, aic_arma202_seriesA)
+)
+
+# Use kableExtra to create a formatted table
+aic_values %>%
+  kable("html", caption = "Model Comparison") %>%
+  kable_styling(bootstrap_options = c("striped", "hover"),
+                full_width = F, position = "center")
+```
+
+We used AIC to compared different ARIMA model, based on the table ARIMA(2,0,2) have the lowest AIC and based on the tsdiag shown below, the model has captured all of the autocorrelation pattern and leave the white noise on the residual. Hence, it perform as an adequate model for this particular time series.
+
+```{r}
+# Extract the coefficient of ARMA(2,0,2)
+summary(arma_202_model_seriesA)
+```
+
+The ARMA(2,0,2) model for the time series indicates that the current value is influenced by both past values and past forecast errors. The AR(1) (-1.6181) and AR(2) (-0.6846) terms suggest an inverse relationship with the values at lag 1 and lag 2, meaning that if the previous values were high, the current value is likely to be lower. The MA(1) (0.8915) and MA(2) (0.2601) terms show that errors from the previous two periods positively affect the current value, with a stronger impact from the most recent error. The model effectively balances these influences, and with low AIC (719.21) and RMSE (1.0527) values, it fits the data well.
+
+### B. Identify ARMA Series B
+
+Since we have define the AR(4) and MA(1) is suitable for this time series as above now we test with the combination of AR and MA to see whether it perform a better fit. Since the AR(4) is out of the range of p and q (0,1,2). Therefore, we can try the MA(2) to see whether it have better performance.
+
+#### B.1 Try with ARMA(0,0,2) model
+
+```{r}
+# Fit the model with ARMA(1,0,1)
+arma_002_model_seriesB <- Arima(data$Series.B, order = c(0, 0, 2))
+
+# Evaluate the model 
+tsdiag(arma_002_model_seriesB)
+```
+
+**Standardized Residuals:** The residuals fluctuate randomly around zero with no clear patterns or trends which is a good sign indicate that model has captured structure of data.
+
+**ACF of Residuals:** The ACF plot shows no significant autocorrelations as most of all values fall within the confidence bounds indicate that there is no autocorrelation in the residual just only white noise.
+
+**Ljung - Box p - values:** The p-values for the Ljung-Box test are consistently above 0.05 for all lags, which indicates that we fail to reject the null hypothesis that there is no autocorrelation in the residuals. Moreover, the p - values are also higher than the MA(1) that we defined in the first question
+
+As a result, ARMA(0,0,2) seem to be an adequate model for this time series.
+
+Let look at the combination of AR and MA
+
+#### B.1 Try with ARMA(1,0,1) model
+
+```{r}
+# Fit the model with ARMA(1,0,1)
+arma_101_model_seriesB <- Arima(data$Series.B, order = c(1, 0, 1))
+
+# Evaluate the model 
+tsdiag(arma_101_model_seriesB)
+```
+
+**Standardized Residuals:** The residuals fluctuate randomly around zero with no clear patterns or trends which is a good sign indicate that model has captured structure of data.
+
+**ACF of Residuals:** The ACF plot shows no significant autocorrelations as all values fall within the confidence bounds suggests that the current model captures all temporal structure in the data.
+
+**Ljung - Box p - values:** The p-values for the Ljung-Box test are consistently above 0.05 for all lags, which indicates that we fail to reject the null hypothesis that there is no autocorrelation in the residuals.
+
+As a result, ARMA(1,0,1) seem to be an adequate model for this series.
+
+#### B.2 Try with ARMA(1,0,2) model
+
+```{r}
+# Fit the model with ARMA(1,0,2)
+arma_102_model_seriesB <- Arima(data$Series.B, order = c(1, 0, 2))
+
+# Evaluate the model 
+tsdiag(arma_102_model_seriesB)
+```
+
+**Standardized Residuals:** The residuals fluctuate randomly around zero with no clear patterns or trends which is a good sign indicate that model has captured structure of data.
+
+**ACF of Residuals:** The ACF plot shows no significant autocorrelations as all values fall within the confidence bounds suggests that the current model captures all temporal structure in the data.
+
+**Ljung - Box p - values:** The p-values for the Ljung-Box test are consistently above 0.05 for all lags, which indicates that we fail to reject the null hypothesis that there is no autocorrelation in the residuals.
+
+As a result, ARMA(1,0,2) seem to be an adequate model for this series.
+
+#### B.3 Try with ARMA(2,0,1) model
+
+```{r}
+# Fit the model with ARMA(1,0,1)
+arma_201_model_seriesB <- Arima(data$Series.B, order = c(2, 0, 1))
+
+# Evaluate the model 
+tsdiag(arma_201_model_seriesB)
+```
+
+**Standardized Residuals:** The residuals fluctuate randomly around zero with no clear patterns or trends which is a good sign indicate that model has captured structure of data.
+
+**ACF of Residuals:** Similar to 2 previous models, the ACF plot shows no significant autocorrelations as all values fall within the confidence bounds suggests that the current model captures all temporal structure in the data.
+
+**Ljung - Box p - values:** The p-values for the Ljung-Box test are consistently above 0.05 for all lags, which indicates that we fail to reject the null hypothesis that there is no autocorrelation in the residuals.
+
+As a result, ARMA(2,0,1) seem to be an adequate model for this series.
+
+#### B.4 Try with ARMA(2,0,2) model
+
+```{r}
+# Fit the model with ARMA(2,0,2)
+arma_202_model_seriesB <- Arima(data$Series.B, order = c(2, 0, 2))
+
+# Evaluate the model 
+tsdiag(arma_202_model_seriesB)
+```
+
+**Standardized Residuals:** The residuals fluctuate randomly around zero with no clear patterns or trends which is a good sign indicate that model has captured structure of data.
+
+**ACF of Residuals:** Similar to 3 previous models, the ACF plot shows no significant autocorrelations as all values fall within the confidence bounds suggests that the current model captures all temporal structure in the data.
+
+**Ljung - Box p - values:** The p-values for the Ljung-Box test are consistently above 0.05 for all lags, which indicates that we fail to reject the null hypothesis that there is no autocorrelation in the residuals.
+
+As a result, ARMA(2,0,1) seem to be an adequate model for this series.
+
+#### Auto Arima For Comparison
+
+```{r}
+# Compare with auto.arima
+auto_arima_seriesB <- auto.arima(data$Series.B)
+
+# show the result 
+auto_arima_seriesB
+```
+
+```{r}
+# Compare the AIC from each model 
+aic_arma400_seriesB <- ar_series_B$aic
+aic_arma001_seriesB <- ma_series_B$aic
+aic_arma101_seriesB <- arma_101_model_seriesB$aic
+aic_arma102_seriesB <- arma_102_model_seriesB$aic
+aic_arma201_seriesB <- arma_201_model_seriesB$aic
+aic_arma202_seriesB <- arma_202_model_seriesB$aic
+aic_auto_arima_seriesB <- auto_arima_seriesB$aic
+```
+
+```{r}
+# Create a data frame for the AIC values
+series_B_aic_values <- data.frame(
+  Model = c("ARMA(4,0,0)","ARMA(0,0,1)","ARMA(1,0,1)", "ARMA(1,0,2)", "ARMA(2,0,1)", "ARMA(2,0,2)", "Auto_Arima(0,0,2)"),
+  AIC = c(aic_arma400_seriesB,aic_arma001_seriesB,aic_arma101_seriesB, aic_arma102_seriesB, aic_arma201_seriesB,
+           aic_arma202_seriesB, aic_auto_arima_seriesB)
+)
+
+# Use kableExtra to create a formatted table
+series_B_aic_values %>%
+  kable("html", caption = "Model Comparison") %>%
+  kable_styling(bootstrap_options = c("striped", "hover"),
+                full_width = F, position = "center")
+```
+
+#### Model Selection
+
+Similar to Series A,, we used AIC to compared different ARIMA model. Based on the table ARIMA(0,0,2) have the lowest AIC which was also chosen by the Auto Arima. The ARMA(0,0,2) tsdiag also shown the model has captured all of the autocorrelation with the very high Ljung - Box test p-value . Therefore, we choose ARMA(0,0,2) as an adequate model for this time series.
+
+### C. Identify ARMA Series C
+
+Since we have define the AR(4) and MA(1) is suitable for this time series as mentioned above now we test with the combination of AR and MA to see whether it perform a better fit.
+
+#### C.1 Try with ARMA(1,0,1)
+
+```{r}
+# Fit the model with AR(2)
+arma_101_model_seriesC <- Arima(data$Series.C, order = c(1, 0, 1))
+
+# Evaluate the model 
+tsdiag(arma_101_model_seriesC)
+```
+
+S**tandardized Residuals:** The residuals fluctuate randomly around zero with no clear patterns or trends which is a good sign indicate that model has captured structure of data.
+
+**ACF of Residuals:** The ACF plot shows no significant autocorrelations as most of all values fall within the confidence bounds.
+
+**Ljung - Box p - values:** The p-values for the Ljung-Box test are consistently above 0.05 for all lags, which indicates that we fail to reject the null hypothesis that there is no autocorrelation in the residuals.
+
+As a result, ARMA(1,0,1) might be an adequate model for this time series
+
+#### C.2 Try with ARMA(1,0,2)
+
+```{r}
+# Fit the model with MA(2)
+arma_102_model_seriesC <- Arima(data$Series.C, order = c(1, 0, 2))
+
+# Evaluate the model 
+tsdiag(arma_102_model_seriesC)
+```
+
+**Standardized Residuals:** The residuals fluctuate randomly around zero with no clear patterns or trends which is a good sign indicate that model has captured structure of data.
+
+**ACF of Residuals:** The ACF plot shows no significant autocorrelations as most of all values fall within the confidence bounds.
+
+**Ljung - Box p - values:** The p-values for the Ljung-Box test are consistently above 0.05 for all lags, which indicates that we fail to reject the null hypothesis that there is no autocorrelation in the residuals.
+
+As a result, ARMA(1,0,2) might be an adequate model for this time series
+
+#### C.3 Try with ARMA(2,0,1)
+
+```{r}
+# Fit the model with MA(2)
+arma_201_model_seriesC <- Arima(data$Series.C, order = c(2, 0, 1))
+
+# Evaluate the model 
+tsdiag(arma_201_model_seriesC)
+```
+
+**Standardized Residuals:** The residuals fluctuate randomly around zero with no clear patterns or trends which is a good sign indicate that model has captured structure of data.
+
+**ACF of Residuals:** The ACF plot shows no significant autocorrelations as most of all values fall within the confidence bounds.
+
+**Ljung - Box p - values:** The p-values for the Ljung-Box test are consistently above 0.05 for all lags, which indicates that we fail to reject the null hypothesis that there is no autocorrelation in the residuals.
+
+As a result, ARMA(1,0,2) might be an adequate model for this time series
+
+#### C.4 Try with ARMA(2,0,2)
+
+```{r}
+# Fit the model with MA(2)
+arma_202_model_seriesC <- Arima(data$Series.C, order = c(2, 0, 2))
+
+# Evaluate the model 
+tsdiag(arma_202_model_seriesC)
+```
+
+**Standardized Residuals:** The residuals fluctuate randomly around zero with no clear patterns or trends which is a good sign indicate that model has captured structure of data.
+
+**ACF of Residuals:** The ACF plot shows no significant autocorrelations as most of all values fall within the confidence bounds.
+
+**Ljung - Box p - values:** The p-values for the Ljung-Box test are consistently above 0.05 for all lags, which indicates that we fail to reject the null hypothesis that there is no autocorrelation in the residuals.
+
+As a result, ARMA(2,0,2) might be an adequate model for this time series
+
+#### C.5 Auto Arima for series C
+
+```{r}
+# Compare with auto.arima
+auto_arima_seriesC <- auto.arima(data$Series.C)
+
+# show the result 
+auto_arima_seriesC
+```
+
+#### Model Selection
+
+```{r}
+# Compare the AIC from each model 
+aic_arma400_seriesC <- ar_series_C$aic
+aic_arma001_seriesC <- ma_series_C$aic
+aic_arma101_seriesC <- arma_101_model_seriesC$aic
+aic_arma102_seriesC <- arma_102_model_seriesC$aic
+aic_arma201_seriesC <- arma_201_model_seriesC$aic
+aic_arma202_seriesC <- arma_202_model_seriesC$aic
+aic_auto_arima_seriesC <- auto_arima_seriesC$aic
+```
+
+```{r}
+# Create a data frame for the AIC values
+series_C_aic_values <- data.frame(
+  Model = c("ARMA(4,0,0)","ARMA(0,0,1)","ARMA(1,0,1)", "ARMA(1,0,2)", "ARMA(2,0,1)", "ARMA(2,0,2)", "Auto_Arima"),
+  AIC = c(aic_arma400_seriesC,aic_arma001_seriesC,aic_arma101_seriesC, aic_arma102_seriesC, aic_arma201_seriesC,
+           aic_arma202_seriesC, aic_auto_arima_seriesC)
+)
+
+# Use kableExtra to create a formatted table
+series_B_aic_values %>%
+  kable("html", caption = "Model Comparison") %>%
+  kable_styling(bootstrap_options = c("striped", "hover"),
+                full_width = F, position = "center")
+```
+
+### D. Identify ARMA Series D
+
+#### D.1 Try with ARMA(1,0,1)
+
+```{r}
+# Fit the model with MA(2)
+arma_101_model_seriesD <- Arima(data$Series.D, order = c(1, 0, 1))
+
+# Evaluate the model 
+tsdiag(arma_101_model_seriesD)
+```
+
+**Standardized Residuals:** the residuals fluctuate randomly around zero with no clear patterns or trends which is a good sign indicate that model has captured some structure of data.
+
+**ACF of Residuals:** However, there is a noticeable spike at lags 6 and lag 18 that falls outside the confidence bounds, indicating that some autocorrelation remains in the residuals.
+
+**Ljung - Box p - values:** only the p-values at lag 1,2 and 4 are below 0.05, indicates that we reject the null hypothesis that there is no autocorrelation in the residuals, there is significant autocorrelation in the residuals at these lags.
+
+The ARMA(1,0,1) model is not a good fit for this time series, as there is still significant autocorrelation in the residuals which the model cannot capture.
+
+#### D.2 Try with ARMA(1,0,2)
+
+```{r}
+# Fit the model with MA(2)
+arma_102_model_seriesD <- Arima(data$Series.D, order = c(1, 0, 2))
+
+# Evaluate the model 
+tsdiag(arma_102_model_seriesD)
+```
+
+**Standardized Residuals:** The residuals fluctuate randomly around zero, there are a few spikes in the residuals between time 100 and 150 but they do not follow any consistent pattern this indicate no clear patterns or trends (random).
+
+**ACF of Residuals:** there is a noticeable spike at lags 6 and lag 18 that falls outside the confidence bounds, indicating that some autocorrelation remains in the residuals.
+
+**Ljung - Box p - values:** however, the p-values at all lags now above 0.05. Therefore, we fail to reject the null hypothesis that there is no autocorrelation in the residuals. And lag 6 might be some white noise.
+
+#### D.3 Try with ARMA(2,0,1)
+
+```{r}
+# Fit the model with MA(2)
+arma_201_model_seriesD <- Arima(data$Series.D, order = c(2, 0, 1))
+
+# Evaluate the model 
+tsdiag(arma_201_model_seriesD)
+```
+
+**Standardized Residuals:** The residuals fluctuate randomly around zero, there are a few spikes in the residuals between time 100 and 150 but they do not follow any consistent pattern this indicate no clear patterns or trends (random).
+
+**ACF of Residuals:** the noticeable spike at lags 6 and lag 18 are now fall below the significant line, indicating ARMA(2,0,1) has captured the autocorrelation at these certain lags compare to the previous one.
+
+**Ljung - Box p - values:** The p-values at all lags now above 0.05. Therefore, we fail to reject the null hypothesis that there is no autocorrelation in the residuals.
+
+#### D.4 Try with ARMA(2,0,2)
+
+```{r}
+# Fit the model with MA(2)
+arma_202_model_seriesD <- Arima(data$Series.D, order = c(2, 0, 2))
+
+# Evaluate the model 
+tsdiag(arma_202_model_seriesD)
+```
+
+**Standardized Residuals:** The residuals fluctuate randomly around zero, there are a few spikes in the residuals between time 100 and 150 but they do not follow any consistent pattern this indicate no clear patterns or trends (random).
+
+**ACF of Residuals:** similar to ARMA(2,0,1) the noticeable spike at lags 6 and lag 18 are now fall below the significant line, this mean the model has captured the autocorrelation at these certain lags.
+
+**Ljung - Box p - values:** The p-values at all lags now above 0.05 especially very high for the first few lags. Therefore, we fail to reject the null hypothesis that there is no autocorrelation in the residuals.
+
+#### D.5 Auto Arima For Comparison
+
+```{r}
+# Compare with auto.arima
+auto_arima_seriesD <- auto.arima(data$Series.D)
+
+# show the result 
+auto_arima_seriesD
+```
+
+#### Model Selection
+
+```{r}
+# Compare the AIC from each model 
+aic_arma600_seriesD <- ar_series_D$aic
+aic_arma002_seriesD <- ma_series_D$aic
+aic_arma101_seriesD <- arma_101_model_seriesD$aic
+aic_arma102_seriesD <- arma_102_model_seriesD$aic
+aic_arma201_seriesD <- arma_201_model_seriesD$aic
+aic_arma202_seriesD <- arma_202_model_seriesD$aic
+aic_auto_arima_seriesD <- auto_arima_seriesD$aic
+```
+
+```{r}
+# Create a data frame for the AIC values
+series_D_aic_values <- data.frame(
+  Model = c("ARMA(6,0,0)","ARMA(0,0,2)","ARMA(1,0,1)", "ARMA(1,0,2)", "ARMA(2,0,1)", "ARMA(2,0,2)", "Auto_Arima(0,0,3)"),
+  AIC = c(aic_arma600_seriesD,aic_arma002_seriesD,aic_arma101_seriesD, aic_arma102_seriesD, aic_arma201_seriesD, aic_arma202_seriesD,
+          aic_auto_arima_seriesD)
+)
+
+# Use kableExtra to create a formatted table
+series_B_aic_values %>%
+  kable("html", caption = "Model Comparison") %>%
+  kable_styling(bootstrap_options = c("striped", "hover"),
+                full_width = F, position = "center")
+```
+
+## Question 03:
+
+```{r}
+# Fetch the data from Yahoo Finance
+getSymbols("BB2.BE", from = "2015-01-01", to = "2024-08-31")
+```
+
+```{r}
+# Extract the Adjusted Price
+burberry_adj_price <- BB2.BE[, "BB2.BE.Adjusted"]
+```
+
+```{r}
+# Find the maximum value of the adjusted price
+max_value <- max(burberry_adj_price, na.rm = TRUE)
+
+# Plot the Adjusted close price with adjusted y-axis limits
+plot(
+  burberry_adj_price, 
+  main = "",  # Leave the main title empty for now
+  col = "blue", 
+  ylab = "Adjusted Price (EUR)", 
+  ylim = c(0, max_value + 5)  
+)
+
+# Center the title after the plot is drawn
+title(main = "Burberry Group Adjusted Price", adj = 0.5)
+
+```
+
+### A. Give a brief explanation of the drop in stock prices as reported by news
+
+The plot shows a notable decline in Burberry Group's stock price from mid-2023 into 2024. This drop is likely linked to several economic factors, such as the luxury sector's slowdown, a delayed recovery in China's economy post-pandemic, and global cost-of-living pressures reducing consumer spending on luxury goods. Additionally, Burberry’s removal from the FTSE 100 index after 15 years further weakened investor confidence, contributing to the sharp decline in its stock price​
+
+Cite: <https://www.independent.co.uk/business/burberry-booted-off-ftse-100-after-15-years-as-share-price-slumps-b2607117.html>
+
+### B. What is an adequate ARMA model for the adjusted price? Produce a tsdiag for the chosen model with comment.
+
+Before finding the adequate ARMA model, we have to make sure the data is stationary before fit it into the model. We used the `ADF` test to check the stationary data
+
+```{r}
+# Check stationarity using Augmented Dickey-Fuller (ADF) test
+suppressWarnings(adf.test(burberry_adj_price$BB2.BE.Adjusted))
+```
+
+According to the `ADF` test, the p-value from the test is 0.7639, which is much higher than the typical significance level of 0.05. This means we fail to reject the null hypothesis of a unit root. Therefore, we do not have enough evidence to suggest that the series is stationary. As a result, it is necessary to difference the data in order to achieve stationarity before proceeding with any further time series modeling, such as ARIMA.
+
+#### B.1 Differencing the time series data
+
+```{r}
+# Take the first difference of the Burberry stock price data
+burberry_diff <- diff(burberry_adj_price)
+```
+
+```{r}
+# Remove the NA value from the differenced data
+burberry_diff <- na.omit(burberry_diff)
+```
+
+```{r}
+# Plot the differenced data to inspect for stationarity visually
+plot(burberry_diff, main = "Differenced Burberry Stock Price", ylab = "Differenced Price", xlab = "Time")
+```
+
+The differenced data appears to fluctuate around zero, with no clear upward or downward trend, which is a key indication of stationarity. This suggests that the process of differencing has helped remove any trend present in the original series. Stationary data should have a constant mean and variance over time. In this plot, the mean seems to hover around zero, and while there is some variation in the volatility (e.g., higher spikes at certain points), the variance looks relatively stable throughout.
+
+There are periods where the magnitude of changes (spikes) is more pronounced, particularly around 2019 and some in 2020. These periods indicate increased volatility in the stock price. In contrast, periods like 2015–2016 and 2021 onwards show more stable price differences, with smaller fluctuations.
+
+The significant spikes (positive or negative) could indicate abnormal events which consider as outliers in the data, where the stock experienced sudden, large movements. These events could correspond to important market events, earnings reports, or other external factors impacting the stock price.
+
+#### B.2 Plot the ACF and PACF to define the order of AR and MA
+
+```{r}
+# Look at the acf and pacf to identify and model and order
+acf(burberry_diff, main = "ACF of Burberry stock price")
+```
+
+```{r}
+# Look at the acf and pacf to identify and model and order
+pacf(burberry_diff, main = "PACF of Burberry stock price")
+```
