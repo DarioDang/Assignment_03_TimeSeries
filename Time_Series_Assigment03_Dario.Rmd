@@ -52,9 +52,9 @@ series_a <- ggplot(data, aes(x = 1:nrow(data), y = Series.A)) +
 series_a
 ```
 
-Comment on the feature:
+Comment on the features:
 
-When we first look at the time series plot for `Series A`, we see that it moves up and down in a repeating pattern, indicating some kind of cyclical behavior. The size of the ups and downs (amplitude) changes over time, becoming larger and smaller at different points. There's no clear trend going up or down overall; it seems to fluctuate around zero. The changes in the series happen quite frequently, showing high variability in a short period of time.
+When we first look at the time series plot for `Series A`, we see that it moves up and down in a repeating pattern, indicating some kind of cyclical behavior. The size of the ups and downs (amplitude) changes over time, becoming larger and smaller at different points. There's no clear trend going up or down overall; it seems to fluctuate around zero. The changes in the series happen quite frequently, showing high variability in a short period of time. The highest value is just over 5, and the lowest value is around -5.
 
 #### 2. Plot for Series B
 
@@ -71,9 +71,9 @@ series_b <- ggplot(data, aes(x = 1:nrow(data), y = Series.B)) +
 series_b
 ```
 
-Comment on the feature:
+Comment on the features:
 
-The time series plot for `Series B` shows a similar oscillating pattern to `Series A`, with values moving above and below zero. However, the fluctuations in `Series B` seem less regular and more erratic. The amplitude of the series still varies over time, with some larger spikes and dips occurring occasionally, but overall the series does not show a consistent increasing or decreasing trend. The oscillations appear some random in size and timing, indicating high variability
+The time series plot for `Series B` shows a similar oscillating pattern to `Series A`, with values moving above and below zero. However, the fluctuations in `Series B` seem less regular and more erratic. The amplitude of the series still varies over time, with some larger spikes and dips occurring occasionally, but overall the series does not show a consistent increasing or decreasing trend. The oscillations appear random in size and timing, indicating high variability. The series takes on values within a range of approximately $\pm 3$.
 
 #### 3. Plot for Series C
 
@@ -90,9 +90,9 @@ series_c <-  ggplot(data, aes(x = 1:nrow(data), y = Series.C)) +
 series_c
 ```
 
-Comment on the feature:
+Comment on the features:
 
-The time series plot for `Series C` displays a similar oscillating pattern as seen in the previous series, but with more pronounced fluctuations. The values oscillate around zero, with some noticeable larger spikes and dips. One feature that stands out is the large dip towards the right side of the plot, which indicates an outlier or a significant drop in the values. The amplitude of the oscillations is not constant, varying throughout the plot. There doesn’t appear to be any clear trend over time, and the oscillations seem irregular, suggesting random variability with occasional extreme values. Further investigation could help determine whether the extreme values represent anomalies or part of a natural pattern.
+The time series plot for `Series C` displays a similar oscillating pattern as seen in the previous series, but with more pronounced fluctuations. The values oscillate around zero, with some noticeable larger spikes and dips. One feature that stands out is the large dip towards the right side of the plot (index $\approx 210$), which indicates an outlier or a significant drop in the values. The amplitude of the oscillations is not constant, varying throughout the plot. There doesn’t appear to be any clear increasing or decreasing trend over time, and the oscillations seem irregular, suggesting random variability with occasional extreme values. Further investigation could help determine whether the extreme values represent anomalies or are part of a natural pattern.
 
 #### 4. Plot for Series D
 
@@ -109,9 +109,9 @@ series_d <- ggplot(data, aes(x = 1:nrow(data), y = Series.D)) +
 series_d
 ```
 
-Comment on the feature:
+Comment on the features:
 
-The time series plot for `Series D` shows an oscillating pattern similar to the previous series, with values fluctuating around zero. One notable feature is that the amplitude of the oscillations varies over time, with more prominent peaks and troughs towards the middle and end of the plot. The series does not exhibit any clear upward or downward trend and remains centered around zero, indicating it may be stationary. The fluctuations appear somewhat more irregular than in some of the other series, with no consistent pattern in the timing of the peaks and troughs. There is a slight tendency for larger downward fluctuations towards the end of the series.
+The time series plot for `Series D` shows an oscillating pattern similar to the previous series, with values for the most part fluctuating around zero. One notable feature is that the amplitude of the oscillations varies over time, with more prominent peaks and troughs towards the middle and end of the plot. The series does not exhibit any clear upward or downward trend and remains centered around zero, indicating it may be stationary. The fluctuations appear somewhat more irregular than in some of the other series, with no consistent pattern in the timing of the peaks and troughs. There is a slight tendency for larger downward fluctuations towards the end of the series.
 
 ### B. Use the PACF to identify AR model, illustrate the reasons of your choice and evaluate the goodness of your model through the `tsdiag` function
 
@@ -125,7 +125,7 @@ The time series plot for `Series D` shows an oscillating pattern similar to the 
 
 First, before we plot the PACF to identify the AR model, we have to check the stationary of each series.
 
-Therefore, we will check the stationary of each dataset using `ADF` test
+Therefore, we will check the stationary of each dataset using Augmented Dickey-Fuller `ADF` test:
 
 ```{r}
 # Check stationarity using Augmented Dickey-Fuller (ADF) test
@@ -135,7 +135,7 @@ suppressWarnings(adf.test(data$Series.C))
 suppressWarnings(adf.test(data$Series.D))
 ```
 
-The p-value is below a certain threshold (usually 0.05), the series is considered stationary. Therefore, we can perform the PACF.
+Assuming that the standard threshold of 0.05 is used, the p-values are below this threshold. This means that we may be justified in considering these series stationary. Therefore, we can perform the PACF.
 
 #### 2. PACF for Series A
 
