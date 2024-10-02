@@ -1,7 +1,12 @@
 ---
 title: "Time_Series_Assignment_03"
 output: html_document
-date: "2024-09-26"
+date: "2024-10-02"
+author:
+  - name: Khuong Dang
+    email: kda115@gmail.com
+  - name: Kane Williams
+    email: pkw21@uclive.ac.nz
 ---
 
 ```{r setup, include=FALSE}
@@ -20,9 +25,9 @@ library(kableExtra)
 
 **Ljung-Box Test Interpretation:**
 
-**If the point above the line:** We fail to reject the null hypothesis that there is no autocorrelation in the residuals.
+**If the point is above the line:** We fail to reject the null hypothesis that there is no autocorrelation in the residuals.
 
-**If the point below the line:** we reject the null hypothesis that there is no autocorrelation in the residuals, indicating that there is significant autocorrelation in the residuals at these lags.
+**If the point is below the line:** we reject the null hypothesis that there is no autocorrelation in the residuals, indicating that there is significant autocorrelation in the residuals at these lags.
 
 ## Question 01
 
@@ -890,3 +895,232 @@ series_B_aic_values %>%
   kable_styling(bootstrap_options = c("striped", "hover"),
                 full_width = F, position = "center")
 ```
+
+## Question 03
+
+### Extracting Time Series and plotting it
+
+Use the library quantmod to extract the daily time series of the share prices of the
+Burberry Group by using the command
+`getSymbols("BB2.BE",from="2015-01-01",to="2024-08-31")`, extract the adjusted
+price and plot it.
+
+```{r}
+library(quantmod)
+library(forecast)
+```
+
+Two series `bb2_adjusted` will be extracted. It will then be differenced to form `bb2_adjusted_diff`.
+
+```{r}
+getSymbols("BB2.BE",from="2015-01-01",to="2024-08-31")
+
+bb2_adjusted <- BB2.BE$BB2.BE.Adjusted
+```
+
+```{r}
+plot(bb2_adjusted)
+```
+
+### Part A
+
+::: boxTask
+Give a brief explanation of the drop in stock prices as reported by the news.
+:::
+
+- Burberry is a luxury fashion house based in London. (Source: https://en.wikipedia.org/wiki/Burberry)
+
+- Assuming "the drop in stock prices" refers to the recent period of 2023 and beyond, then the reason may be due to the decrease in higher-spending chinese consumers, which are play a large part in purchasing Burberry's goods. 
+
+- As reported by the news, “The problem clearly is China, which emerged from being a very small player in the luxury goods industry to becoming a massive presence over the last decade or so." (Source: https://www.cnbc.com/2024/09/23/luxury-stocks-slip-as-fears-grow-of-a-prolonged-downturn.html)
+
+### Part B
+
+::: boxTask
+What is an adequate ARMA model for the adjusted price? Produce a tsdiag for
+the chosen model with comment.
+:::
+
+<!-- ### A note on stationarity -->
+
+<!-- *Note on stationarity:* Looking at the plots above, the data generating process for `bb2_adjusted` is likely non-stationary. This can be seen by the mean of the data varying across different time periods. Considering ARMA models taught by STAT456 are under the assumption that time series are stationary (Lecture Set 09 - AR Models, Slide 2), then ARMA models may not hold particularly well for this dataset as it currently is. Differencing the data may provide a better approximation of a stationary process.  -->
+
+<!-- <!-- Nevertheless, for the purposes of this assignment `bb2_adjusted` will be analysed and modeled rather than `bb2_adjusted_diff`. --> -->
+
+<!-- Running the Augmented Dickey-Fuller (ADF) test, it will be seen that `bb2_adjusted` has a p value of greater than $0.05$, and `bb2_adjusted_diff` has a p-value of less than $0.05$. This is further evidence that the differenced series may be stationary, while the non-differenced series is not. -->
+
+
+<!-- ```{r} -->
+<!-- library(tseries) -->
+<!-- adf.test(bb2_adjusted) -->
+<!-- adf.test(bb2_adjusted_diff) -->
+<!-- ``` -->
+
+<!-- Nevertheless, the original (non-differenced) series `bb2_adjusted` will be investigated. This can be justified because a stationary model can be used to model a non-stationary process - it may just not necessarily be an accurate model. -->
+
+To find an adequate ARMA model for the adjusted price, let's investigate the ACF and PACF plots to see what an appropriate model could be.
+
+#### ACF/PACF
+
+```{r}
+acf(bb2_adjusted, lag.max = 100, main="ACF of BB2.BE adjusted data (daily)")
+pacf(bb2_adjusted, lag.max = 100, main="PACF of BB2.BE adjusted data (daily)")
+```
+
+- The ACF chart shows significant autocorrelations for all $\texttt{lag} < 100$, all of which are slowly tailing off. This may appear unusual, but could just be a sign that we modeling a non-stationary process. This may also indicate that there is no MA component/there is an AR component.
+
+- On the other hand, the PACF is significant in the first lag. This is likely a strong indication that there is an AR(1) component. There are some other sparsely distributed significant lags, e.g. $\texttt{lag} = 78$, however these are so far away from the start that it is very likely to just be noise.
+
+Both of these facts suggests that an ARMA($1$,$0$) model is appropriate, i.e. the time series could be modeled as an AR($1$) process. Let's show the `summary()` and `tsdiag()` for the first 4 AR processes starting at 0 to confirm:
+
+##### AR(0)
+
+```{r}
+model_ar0 <- arima(bb2_adjusted, order=c(0,0,0))
+summary(model_ar0)
+tsdiag(model_ar0)
+```
+
+The white noise (ARMA($0$,$0$)) process is clearly a bad fit. The residuals do not look like white noise, and the p-values in the Ljung-Box statistic are all below the $0.05$ level, showing that there is autocorrelation between the residuals.
+
+##### AR(1)
+
+```{r}
+model_ar1 <- arima(bb2_adjusted, order=c(1,0,0))
+summary(model_ar1)
+tsdiag(model_ar1)
+```
+
+The AR($1$) model appears to be a decent fit: 
+
+  (i) There are no clear ACFs above the line of significance (apart from the trivial lag $0$), 
+  (ii) the standardized residuals approximately look like white noise, and 
+  (iii) the p values for the Ljung-Box statistic are all above the line of significance, showing that we can fail to reject the null hypothesis that there is autocorrelation in the residuals. The AIC value is $2213.18$. 
+
+##### AR(2)
+
+```{r}
+model_ar2 <- arima(bb2_adjusted, order=c(2,0,0))
+summary(model_ar2)
+tsdiag(model_ar2)
+```
+
+All the comments for the above AR($1$) model apply. AR($2$) is a model of decent fit. The AIC is now a higher $2214.9$, which shows that AR($2$) may be slightly less optimal than AR($1$).
+
+##### AR(3)
+
+```{r}
+model_ar3 <- arima(bb2_adjusted, order=c(3,0,0))
+summary(model_ar3)
+tsdiag(model_ar3)
+```
+
+As above, but the AIC is now $2216.33$. This increasing AIC may indicate that we are starting to overfit on the data. 
+
+##### Conclusion
+
+Having run the above `summary` and `tsdiag`s of AR($0$) to AR($3$), it appears that ARMA($1$, $0$) = AR($1$) fits `bb2_adjusted` the best. The coefficients are **TODO**
+
+#### auto.arima()
+
+To confirm the above findings, let's see if auto.arima() gives the same result:
+
+```{r}
+model_auto <- auto.arima(bb2_adjusted, max.d=0) # d = 0 so it just tests ARMA instead of ARIMA
+summary(model_auto)
+tsdiag(model_auto)
+```
+
+Interestingly, auto.arima() returns an ARMA($0,5$) model (i.e. MA($5$)). This has a worse AIC ($5029.44$) than AR($1$), and the standardized residuals look far from white noise. This does not appear to be a good model. ARMA($1$, $0$) still appears to be the most 'adequate' model for this data.
+
+## Part C
+
+::: boxTask
+Use the xts library to transoform the daily adjusted prices from the previous
+question to a monthly close series and plot it.
+:::
+
+```{r}
+monthly_data <- xts::to.monthly(bb2_adjusted, OHLC=TRUE)
+monthly_close <- monthly_data$bb2_adjusted.Close
+plot(monthly_close, main="Monthly Close Prices of BB2.BE (Burberry Group)")
+```
+
+### Part D
+
+::: boxTask
+Identify a suitable ARMA model for the monthly close prices and verify its adequacy with `tsdiag`.
+:::
+
+As with the daily data, let's begin by analyzing the ACF and PACF.
+
+#### ACF/PACF
+
+```{r}
+acf(monthly_close, main="ACF of Monthly Close Prices")
+pacf(monthly_close, main="PACF of Monthly Close Prices")
+```
+
+- Again, the ACF shows a high and slowly decreasing autocorrelation. This likely indicates an AR(p) process.
+
+- The PACF has a (very) significant first lag, as with the daily graph. This indicates an AR($1$) process, where the stock price one month ago can give information about the current stock price. There are also significant lags at lag $6$ and $13$. It is unclear whether these lags are very meaningful, given the data only spans 10 years.  Nevertheless, these models can be investigated: AR(1), AR(6), and AR(13).
+
+##### AR(1)
+
+```{r}
+model_month_ar1 <- arima(monthly_close, order=c(1,0,0))
+summary(model_month_ar1)
+tsdiag(model_month_ar1, gof.lag=13)
+```
+
+- The standardized residuals plot does not appear like white noise. In particular, the variance appears small in the beginning of the plot compared to the end. Towards the end, there is also a clear negative bias in the residuals.
+
+- Most ACF of the residuals are within the lines of significance, with a couple of exceptions (lag $5$ and lag $12$). This is happening more than chance ($\frac{1}{20}$ given a p-value of $0.05$) which means this is likely not just noise.
+
+- All the p-values for the Ljung-Box statistic are above the line of significance. This means that we fail to reject the null hypothesis that the residuals are independently distributed. In other words, there is no significant evidence of autocorrelation in the residuals up to all the lags tested. Note that this result somewhat contradicts the observation on the standardized residuals.
+
+- The sole coefficient $\texttt{ar1}$ is $0.9193$. This shows that there is a correlation by the time series and itself (at $\texttt{lag}=1$) by this amount. This is very easy to intepret.
+
+- The AIC is $450.38$.
+
+##### AR(6)
+
+```{r}
+model_month_ar6 <- arima(monthly_close, order=c(6,0,0))
+summary(model_month_ar6)
+tsdiag(model_month_ar6)
+```
+
+With the AR ($6$) model:
+
+- The standardized residuals look mostly the same,
+- The ACF is significant only for lag $12$.
+- The p-values are very high, which means we can fail to reject the hypothesis that the residuals are independently distributed.
+- The highest coefficient is the first one ($\texttt{ar1} = 0.9977$). Coefficients $\texttt{ar2}, \texttt{ar3},$ and $\texttt{ar4}$ are not significant (the coefficient value is contained within $2 \times \texttt{s.e.}$). Coefficient $\texttt{ar5}$ is $0.2912$ and significant, and coefficient $\texttt{ar6}$ is $-0.26$ as well as significant.
+
+The AIC is lower, at $449.09$. Even though the AIC is lower, AR($1$) may still be the more sensible model because it is simpler (parsimony, as it has less autoregressive terms).
+
+##### AR(13)
+
+```{r}
+model_month_ar13 <- arima(monthly_close, order=c(13,0,0))
+summary(model_month_ar13)
+tsdiag(model_month_ar13)
+```
+
+These results for the AR($13$) graphs look similar to the AR($6$) graphs only mildly improving them. The AIC is also worse than both AR($6$) and AR($1$), being at $457.56$ which suggests this model is not optimal compared to them. 
+
+Thus, the most sensible model is possibly AR($1$).
+
+### Part E
+
+::: boxTask
+STAT456 and ECON614 students should also comment on the different models
+for the daily series and the monthly series.
+:::
+
+
+```{r}
+# TODO MANUAL
+```
+
