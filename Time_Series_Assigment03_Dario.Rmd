@@ -622,7 +622,7 @@ tsdiag(arma_202_model_seriesB)
 
 As a result, ARMA(2,0,1) seem to be an adequate model for this series.
 
-#### Auto Arima For Comparison
+#### B.5 Auto Arima For Comparison
 
 ```{r}
 # Compare with auto.arima
@@ -747,7 +747,7 @@ tsdiag(arma_202_model_seriesC)
 
 As a result, ARMA(2,0,2) might be an adequate model for this time series
 
-#### C.5 Auto Arima for series C
+#### C.5 Try Auto Arima for series C
 
 ```{r}
 # Compare with auto.arima
@@ -853,7 +853,7 @@ tsdiag(arma_202_model_seriesD)
 
 **Ljung - Box p - values:** The p-values at all lags now above 0.05 especially very high for the first few lags. Therefore, we fail to reject the null hypothesis that there is no autocorrelation in the residuals.
 
-#### D.5 Auto Arima For Comparison
+#### D.5 Try Auto Arima For Comparison
 
 ```{r}
 # Compare with auto.arima
@@ -889,86 +889,4 @@ series_B_aic_values %>%
   kable("html", caption = "Model Comparison") %>%
   kable_styling(bootstrap_options = c("striped", "hover"),
                 full_width = F, position = "center")
-```
-
-## Question 03:
-
-```{r}
-# Fetch the data from Yahoo Finance
-getSymbols("BB2.BE", from = "2015-01-01", to = "2024-08-31")
-```
-
-```{r}
-# Extract the Adjusted Price
-burberry_adj_price <- BB2.BE[, "BB2.BE.Adjusted"]
-```
-
-```{r}
-# Find the maximum value of the adjusted price
-max_value <- max(burberry_adj_price, na.rm = TRUE)
-
-# Plot the Adjusted close price with adjusted y-axis limits
-plot(
-  burberry_adj_price, 
-  main = "",  # Leave the main title empty for now
-  col = "blue", 
-  ylab = "Adjusted Price (EUR)", 
-  ylim = c(0, max_value + 5)  
-)
-
-# Center the title after the plot is drawn
-title(main = "Burberry Group Adjusted Price", adj = 0.5)
-
-```
-
-### A. Give a brief explanation of the drop in stock prices as reported by news
-
-The plot shows a notable decline in Burberry Group's stock price from mid-2023 into 2024. This drop is likely linked to several economic factors, such as the luxury sector's slowdown, a delayed recovery in China's economy post-pandemic, and global cost-of-living pressures reducing consumer spending on luxury goods. Additionally, Burberry’s removal from the FTSE 100 index after 15 years further weakened investor confidence, contributing to the sharp decline in its stock price​
-
-Cite: <https://www.independent.co.uk/business/burberry-booted-off-ftse-100-after-15-years-as-share-price-slumps-b2607117.html>
-
-### B. What is an adequate ARMA model for the adjusted price? Produce a tsdiag for the chosen model with comment.
-
-Before finding the adequate ARMA model, we have to make sure the data is stationary before fit it into the model. We used the `ADF` test to check the stationary data
-
-```{r}
-# Check stationarity using Augmented Dickey-Fuller (ADF) test
-suppressWarnings(adf.test(burberry_adj_price$BB2.BE.Adjusted))
-```
-
-According to the `ADF` test, the p-value from the test is 0.7639, which is much higher than the typical significance level of 0.05. This means we fail to reject the null hypothesis of a unit root. Therefore, we do not have enough evidence to suggest that the series is stationary. As a result, it is necessary to difference the data in order to achieve stationarity before proceeding with any further time series modeling, such as ARIMA.
-
-#### B.1 Differencing the time series data
-
-```{r}
-# Take the first difference of the Burberry stock price data
-burberry_diff <- diff(burberry_adj_price)
-```
-
-```{r}
-# Remove the NA value from the differenced data
-burberry_diff <- na.omit(burberry_diff)
-```
-
-```{r}
-# Plot the differenced data to inspect for stationarity visually
-plot(burberry_diff, main = "Differenced Burberry Stock Price", ylab = "Differenced Price", xlab = "Time")
-```
-
-The differenced data appears to fluctuate around zero, with no clear upward or downward trend, which is a key indication of stationarity. This suggests that the process of differencing has helped remove any trend present in the original series. Stationary data should have a constant mean and variance over time. In this plot, the mean seems to hover around zero, and while there is some variation in the volatility (e.g., higher spikes at certain points), the variance looks relatively stable throughout.
-
-There are periods where the magnitude of changes (spikes) is more pronounced, particularly around 2019 and some in 2020. These periods indicate increased volatility in the stock price. In contrast, periods like 2015–2016 and 2021 onwards show more stable price differences, with smaller fluctuations.
-
-The significant spikes (positive or negative) could indicate abnormal events which consider as outliers in the data, where the stock experienced sudden, large movements. These events could correspond to important market events, earnings reports, or other external factors impacting the stock price.
-
-#### B.2 Plot the ACF and PACF to define the order of AR and MA
-
-```{r}
-# Look at the acf and pacf to identify and model and order
-acf(burberry_diff, main = "ACF of Burberry stock price")
-```
-
-```{r}
-# Look at the acf and pacf to identify and model and order
-pacf(burberry_diff, main = "PACF of Burberry stock price")
 ```
