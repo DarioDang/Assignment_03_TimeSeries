@@ -238,7 +238,7 @@ tsdiag(ar_series_D)
 acf(data$Series.A, main = "ACF of Series A")
 ```
 
-Based on the ACF plot for Series A, the autocorrelations at lags 1 to 8 are significantly different from zero at the 5% significance level. After lag 8, the ACF values drop close to zero, suggesting that the autocorrelations are no longer significant. This cut-off behaviour after lag 8 indicates that an MA(8) model could be appropriate for this series, as the moving average process is likely to extend up to 8 lags.
+Based on the ACF plot for Series A, the autocorrelations at lags 1 to 8 are significantly different from zero at the 5% significance level. After lag 8, the ACF values drop close to zero, suggesting that the autocorrelations are no longer significant. This cut-off behaviour after lag 8 indicates that an MA(8) model could be appropriate for this series, as the moving average process is likely to extend up to 8 lags. Alternatively, this tailing off behaviour could indicate it is better modelled by an AR process, so an MA(0) may even be appropriate.
 
 ```{r}
 # Fit the MA(8) model to time series A
@@ -254,7 +254,7 @@ tsdiag(ma_series_A)
 
 **Ljung - Box p - values:** The p-values for the Ljung-Box test are consistently above 0.05 for all lags. This confirm we fail to reject the null hypothesis that there is no autocorrelation in the residuals.
 
-Based on the diagnostic check, the MA(8) model seems to be a good fit for Series A.
+Based on the diagnostic check, the MA(8) model seems to be a good fit for Series A. It is almost "too good" and there is a chance it is overfitting the data.
 
 #### 2. ACF for Series B
 
@@ -263,7 +263,7 @@ Based on the diagnostic check, the MA(8) model seems to be a good fit for Series
 acf(data$Series.B, main = "ACF of Series B")
 ```
 
-Based on the ACF plot or series B, the autocorrelations at lags 1 are significantly different from zero at the 5% significance level. The ACF cut off at lag 1 indicate no further significant value until lag 8, however, these may be due to noise or randomness. Hence, The sharp cut-off in the ACF at lag 1 suggests that an MA(1) model could adequately capture the main structure of the data without adding unnecessary complexity. Therefore, an MA(1) model might appropriate for this series.
+Based on the ACF plot or series B, the autocorrelations at lags 1 are significantly different from zero at the 5% significance level. The ACF cut off at lag 1 indicates no further significant value until lag 8, however, these may be due to noise or randomness. Hence, The sharp cut-off in the ACF at lag 1 suggests that an MA(1) model could adequately capture the main structure of the data without adding unnecessary complexity. Therefore, an MA(1) model might appropriate for this series.
 
 ```{r}
 # Fit the MA(1) model to time series B
@@ -288,7 +288,7 @@ Based on the diagnostic check, the MA(1) model seems to be a good fit for Series
 acf(data$Series.C, main = "ACF of Series C")
 ```
 
-Comment: There is a significant spike at lag 1 that exceeds the confidence bounds, indicating that there is strong autocorrelation at this lag. After lag 1, the autocorrelation values quickly diminish, with subsequent lags mostly within the confidence bounds. The small and insignificant autocorrelation values at lag 8 and lag 13, suggest that there might be some white noise. Hence, the ACF shows a sharp cut - off at lag 1, this suggest the MA(1) is likely appropriate
+Comment: There is a significant spike at lag 1 that exceeds the confidence bounds, indicating that there is strong autocorrelation at this lag. After lag 1, the autocorrelation values quickly diminish, with subsequent lags mostly within the confidence bounds. The small and insignificant autocorrelation values at lag 8 and lag 13, suggest that there might be some white noise. Hence, the ACF shows a sharp cut - off at lag 1, this suggest the MA(1) is likely appropriate. There is also a cyclical pattern in the ACF.
 
 ```{r}
 # Fit the MA(2) model to time series D
@@ -313,7 +313,7 @@ Based on the diagnostic check, the MA(1) model seems to be a good fit for Series
 acf(data$Series.D, main = "ACF of Series D")
 ```
 
-Comment: According to the ACF plot for time series D, the autocorrelations at lags 1 and 2 are significantly different from zero at the 5% significance level. After lag 2, the ACF values drop close to zero, indicating no significant autocorrelation at further lags. While there are some minor spikes at lags 6, 17, and 18, these are likely due to noise or randomness in the data and do not suggest any meaningful structure. The sharp cut-off in the ACF after lag 2 suggests that an MA(2) model is appropriate for this series, as it can capture the main structure of the data.
+Comment: According to the ACF plot for time series D, the autocorrelations at lags 1 and 2 are significantly different from zero at the 5% significance level. After lag 2, the ACF values drops close to zero, indicating no significant autocorrelation at further lags. While there are some minor spikes at lags 6, 17, and 18, barely above or just under the lines of significance, these are likely due to noise or randomness in the data and do not suggest any meaningful structure. The sharp cut-off in the ACF after lag 2 suggests that an MA(2) model is appropriate for this series, as it can capture the main structure of the data.
 
 ```{r}
 # Fit the MA(2) model to time series D
