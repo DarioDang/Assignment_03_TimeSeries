@@ -711,11 +711,13 @@ arma_00_model_seriesC <- Arima(data$Series.C, order = c(0, 0, 0))
 tsdiag(arma_00_model_seriesC)
 ```
 
-The ACF plot shows significance at lag 1 indicating the original ARMA(0,1) model was the right choice. Furthermore, all the p-values for the Ljung-Box statistic are below 0, which means that we can reject the null hypothesis that there is no significant autocorrelation for the residuals for these lags. This all points to ARMA(0,0) being a poor model for this time series. The original ARMA(0,1) model is likely a good fit. Increasing the MA component by one to an ARMA(0,2) model may lead to overfitting, considering the residuals for ARMA(0,1) already approximate white noise. It is better to keep the simpler model here.
+The ACF plot shows significance at lag 1 indicating the original ARMA(0,1) model was the right choice. Furthermore, all the p-values for the Ljung-Box statistic are below 0, which means that we can reject the null hypothesis that there is no significant autocorrelation for the residuals for these lags. This all suggests that the ARMA(0,0) white noise model is a poor one for this time series. The original ARMA(0,1) model is a better fit. 
 
-#### C.5 Try Auto Arima for series C
+Considering the residuals for ARMA(0,1) already approximate white noise fairly well. Increasing the MA component by one to an ARMA(0,2) model may lead to overfitting. By being parsimonious, it is better to keep the simpler ARMA(0,1) model.
 
 Let's now compare ARMA(0,1) with the one provided by `auto.arima()`.
+
+#### C.5 Try Auto Arima for series C
 
 ```{r}
 # Compare with auto.arima
@@ -724,14 +726,28 @@ auto_arima_seriesC <- auto.arima(data$Series.C)
 # show the result 
 auto_arima_seriesC
 ```
-`auto.arima()` provides an ARMA(2,4) model.
+
+`auto.arima()` provides an ARMA(2,4) model. It has a relatively low AIC of 703.6.
+
+```{r}
+tsdiag(auto_arima_seriesC)
+```
+
+All the tsdiag outputs suggest that the residuals of ARMA(2,4) are a white noise process. The ACF of the residuals are within the lines of significance, and the p values of the Ljung-Box statistic are above the lines of significance.
+
+The ARMA(2,4) model is arguably a better fit, however it is more complicated than the ARMA(0,1) model and depending on the purposes of the modeling, either model could be used.
 
 #### Model Selection
+
+Lastly, let's compare AICs of all the possible models with $0 \leq p \leq 3$ and $0 \leq q \leq 3$ as another method to determine whether ARMA(0,1) was ultimately a good fit.
 
 ```{r}
 # Compare the AIC from each model 
 aic_arma00_seriesC <- Arima(data$Series.C, order = c(0, 0, 0))$aic
 aic_arma01_seriesC <- Arima(data$Series.C, order = c(0, 0, 1))$aic
+aic_arma10_seriesC <- Arima(data$Series.C, order = c(1, 0, 0))$aic
+aic_arma02_seriesC <- Arima(data$Series.C, order = c(0, 0, 2))$aic
+aic_arma20_seriesC <- Arima(data$Series.C, order = c(2, 0, 0))$aic
 aic_arma11_seriesC <- Arima(data$Series.C, order = c(1, 0, 1))$aic
 aic_arma12_seriesC <- Arima(data$Series.C, order = c(1, 0, 2))$aic
 aic_arma21_seriesC <- Arima(data$Series.C, order = c(2, 0, 1))$aic
@@ -742,8 +758,8 @@ aic_auto_arima_seriesC <- auto_arima_seriesC$aic
 ```{r}
 # Create a data frame for the AIC values
 series_C_aic_values <- data.frame(
-  Model = c("ARMA(0,0)","ARMA(0,1)","ARMA(1,1)", "ARMA(1,2)", "ARMA(2,1)", "ARMA(2,2)", "Auto_Arima"),
-  AIC = c(aic_arma00_seriesC,aic_arma01_seriesC,aic_arma11_seriesC, aic_arma12_seriesC, aic_arma21_seriesC,
+  Model = c("ARMA(0,0)","ARMA(0,1)", "ARMA(1,0)", "ARMA(0,2)", "ARMA(2, 0)", "ARMA(1,1)", "ARMA(1,2)", "ARMA(2,1)", "ARMA(2,2)", "Auto_Arima"),
+  AIC = c(aic_arma00_seriesC,aic_arma01_seriesC,aic_arma10_seriesC,aic_arma02_seriesC,aic_arma20_seriesC,aic_arma11_seriesC, aic_arma12_seriesC, aic_arma21_seriesC,
            aic_arma22_seriesC, aic_auto_arima_seriesC)
 )
 
@@ -753,6 +769,8 @@ series_C_aic_values %>%
   kable_styling(bootstrap_options = c("striped", "hover"),
                 full_width = F, position = "center")
 ```
+
+Excluding Auto_Arima, ARMA(0,1) had the third lowest AIC. Surprisingly, ARMA(0,2) and ARMA(1,1) had better AIC terms.
 
 ### D. Identify ARMA Series D
 
