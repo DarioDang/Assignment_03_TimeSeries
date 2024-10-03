@@ -327,7 +327,7 @@ tsdiag(ma_series_D)
 
 **ACF of Residuals:** The ACF plot shows no significant autocorrelations remaining, as all values fall within the confidence bounds. While there are small spikes at lags 6 and 18, these values remain within the confidence limits and likely result from random fluctuations or noise. They are unlikely to affect the model significantly but are worth noting for potential further investigation.
 
-**Ljung - Box p - values:** The p-values are mostly above the 0.05 threshold for all lags, there are a few lags show slightly lower p-values (closer to the 0.05 mark), but they are still above the threshold. This indicate model capture all the autocorrelation and the spikes at lag 6 and 18 is some random noise Therefore, we fail to reject the null hypothesis that there is no autocorrelation in the residuals.
+**Ljung - Box p - values:** The p-values are mostly above the 0.05 threshold for all lags, there are a few lags show slightly lower p-values (closer to the 0.05 mark), but they are still above the threshold. This indicate model capture all the autocorrelation and the spikes at lag 6 and 18 is some random noise. Therefore, we fail to reject the null hypothesis that there is no autocorrelation in the residuals.
 
 Based on the diagnostic check, the MA(2) model seems to be a good fit for Series D.
 
@@ -335,7 +335,7 @@ Based on the diagnostic check, the MA(2) model seems to be a good fit for Series
 
 ### A. Identify ARMA Series A
 
-#### A.1 Try with ARMA(1,0,0) model
+#### A.1 Try with ARMA(1,0) model
 
 ```{r}
 # Fit the model with AR(1)
@@ -353,7 +353,7 @@ tsdiag(arma_100_model_seriesA)
 
 As a result, ARMA(1,0,0) may not fully capture the underlying autocorrelation structure of the time series indicate this is not a best fit model for this series.
 
-#### A.2 Try with ARMA(2,0,0) model
+#### A.2 Try with ARMA(2,0) model
 
 ```{r}
 # Fit the model with ARMA(2,0,0)
@@ -371,7 +371,7 @@ tsdiag(arma_200_model_seriesA)
 
 As a result, this model might fit well to the data but some notice at lag 9 might be need to further investigate.
 
-#### A.3 Try with ARMA(1,0,1) model
+#### A.3 Try with ARMA(1,1) model
 
 ```{r}
 # Fit the model with AR(1)
@@ -389,7 +389,7 @@ tsdiag(arma_101_model_seriesA)
 
 Therefore, ARMA(1,0,1) is not an adequate model for this time series since not capture all pattern of data.
 
-#### A.4 Try with ARMA(1,0,2) model
+#### A.4 Try with ARMA(1,2) model
 
 ```{r}
 # Fit the model with AR(1,0,2)
@@ -407,7 +407,7 @@ tsdiag(arma_102_model_seriesA)
 
 Therefore, ARMA(1,0,2) is represented as an adequate model for this series.
 
-#### A.5 Try with ARMA(0,0,1) model
+#### A.5 Try with ARMA(0,1) model
 
 ```{r}
 # Fit the model with AR(0,0,1)
@@ -425,7 +425,7 @@ tsdiag(arma_001_model_seriesA)
 
 The ARMA(0,0,1) model is not a good fit for this time series, as there is still significant autocorrelation in the residuals which the model cannot capture.
 
-#### A.6 Try with ARMA(0,0,2) model
+#### A.6 Try with ARMA(0,2) model
 
 ```{r}
 # Fit the model with AR(0,0,2)
@@ -443,7 +443,7 @@ tsdiag(arma_002_model_seriesA)
 
 The ARMA(0,0,2) model is not a good fit for this time series, as there is still significant autocorrelation in the residuals which the model cannot capture.
 
-#### A.7 Try with ARMA(2,0,1) model
+#### A.7 Try with ARMA(2,1) model
 
 ```{r}
 # Fit the model with AR(2,0,1)
@@ -461,7 +461,7 @@ tsdiag(arma_201_model_seriesA)
 
 This suggest that the ARMA(2,0,1) is an adequate model for this series but the p values at lag 9 just slightly above the line, hence, ARMA(2,0,2) might get a better result in this case.
 
-#### A.8 Try with ARMA(2,0,2) model
+#### A.8 Try with ARMA(2,2) model
 
 ```{r}
 # Fit the model with AR(2,0,1)
@@ -535,7 +535,7 @@ The ARMA(2,0,2) model for the time series indicates that the current value is in
 
 Since we have define the AR(4) and MA(1) is suitable for this time series as above now we test with the combination of AR and MA to see whether it perform a better fit. Since the AR(4) is out of the range of p and q (0,1,2). Therefore, we can try the MA(2) to see whether it have better performance.
 
-#### B.1 Try with ARMA(0,0,2) model
+#### B.1 Try with ARMA(0,2) model
 
 ```{r}
 # Fit the model with ARMA(1,0,1)
@@ -555,7 +555,7 @@ As a result, ARMA(0,0,2) seem to be an adequate model for this time series.
 
 Let look at the combination of AR and MA
 
-#### B.1 Try with ARMA(1,0,1) model
+#### B.1 Try with ARMA(1,1) model
 
 ```{r}
 # Fit the model with ARMA(1,0,1)
@@ -573,7 +573,7 @@ tsdiag(arma_101_model_seriesB)
 
 As a result, ARMA(1,0,1) seem to be an adequate model for this series.
 
-#### B.2 Try with ARMA(1,0,2) model
+#### B.2 Try with ARMA(1,2) model
 
 ```{r}
 # Fit the model with ARMA(1,0,2)
@@ -591,7 +591,7 @@ tsdiag(arma_102_model_seriesB)
 
 As a result, ARMA(1,0,2) seem to be an adequate model for this series.
 
-#### B.3 Try with ARMA(2,0,1) model
+#### B.3 Try with ARMA(2,1) model
 
 ```{r}
 # Fit the model with ARMA(1,0,1)
@@ -609,7 +609,7 @@ tsdiag(arma_201_model_seriesB)
 
 As a result, ARMA(2,0,1) seem to be an adequate model for this series.
 
-#### B.4 Try with ARMA(2,0,2) model
+#### B.4 Try with ARMA(2,2) model
 
 ```{r}
 # Fit the model with ARMA(2,0,2)
@@ -680,7 +680,7 @@ The ARMA(0,0,2) model for series B indicates that the current value is influence
 
 Since we have define the AR(4) and MA(1) is suitable for this time series as mentioned above now we test with the combination of AR and MA to see whether it perform a better fit.
 
-#### C.1 Try with ARMA(1,0,1)
+#### C.1 Try with ARMA(1,1)
 
 ```{r}
 # Fit the model with AR(2)
@@ -698,7 +698,7 @@ S**tandardized Residuals:** The residuals fluctuate randomly around zero with no
 
 As a result, ARMA(1,0,1) might be an adequate model for this time series
 
-#### C.2 Try with ARMA(1,0,2)
+#### C.2 Try with ARMA(1,2)
 
 ```{r}
 # Fit the model with MA(2)
@@ -716,7 +716,7 @@ tsdiag(arma_102_model_seriesC)
 
 As a result, ARMA(1,0,2) might be an adequate model for this time series
 
-#### C.3 Try with ARMA(2,0,1)
+#### C.3 Try with ARMA(2,1)
 
 ```{r}
 # Fit the model with MA(2)
@@ -734,7 +734,7 @@ tsdiag(arma_201_model_seriesC)
 
 As a result, ARMA(1,0,2) might be an adequate model for this time series
 
-#### C.4 Try with ARMA(2,0,2)
+#### C.4 Try with ARMA(2,2)
 
 ```{r}
 # Fit the model with MA(2)
@@ -792,7 +792,7 @@ series_B_aic_values %>%
 
 ### D. Identify ARMA Series D
 
-#### D.1 Try with ARMA(1,0,1)
+#### D.1 Try with ARMA(1,1)
 
 ```{r}
 # Fit the model with MA(2)
@@ -810,7 +810,7 @@ tsdiag(arma_101_model_seriesD)
 
 The ARMA(1,0,1) model is not a good fit for this time series, as there is still significant autocorrelation in the residuals which the model cannot capture.
 
-#### D.2 Try with ARMA(1,0,2)
+#### D.2 Try with ARMA(1,2)
 
 ```{r}
 # Fit the model with MA(2)
@@ -826,7 +826,7 @@ tsdiag(arma_102_model_seriesD)
 
 **Ljung - Box p - values:** however, the p-values at all lags now above 0.05. Therefore, we fail to reject the null hypothesis that there is no autocorrelation in the residuals. And lag 6 might be some white noise.
 
-#### D.3 Try with ARMA(2,0,1)
+#### D.3 Try with ARMA(2,1)
 
 ```{r}
 # Fit the model with MA(2)
@@ -842,7 +842,7 @@ tsdiag(arma_201_model_seriesD)
 
 **Ljung - Box p - values:** The p-values at all lags now above 0.05. Therefore, we fail to reject the null hypothesis that there is no autocorrelation in the residuals.
 
-#### D.4 Try with ARMA(2,0,2)
+#### D.4 Try with ARMA(2,2)
 
 ```{r}
 # Fit the model with MA(2)
