@@ -86,7 +86,7 @@ series_c
 
 Comment on the features:
 
-The time series plot for `Series C` displays a similar oscillating pattern as seen in the previous series, but with more pronounced fluctuations. The values oscillate around zero, with some noticeable larger spikes and dips. One feature that stands out is the large dip towards the right side of the plot (index $\approx 210$), which indicates an outlier or a significant drop in the values. The amplitude of the oscillations is not constant, varying throughout the plot. There doesn’t appear to be any clear increasing or decreasing trend over time, and the oscillations seem irregular, suggesting random variability with occasional extreme values. Further investigation could help determine whether the extreme values represent anomalies or are part of a natural pattern.
+The time series plot for `Series C` displays a similar oscillating pattern as seen in the previous series, but with more pronounced fluctuations. The values oscillate around zero, with some noticeable larger spikes and dips. One feature that stands out is the large dip towards the right side of the plot (index $\approx 210$, value $\approx 5.2$), which indicates an outlier or a significant drop in the values. The amplitude of the oscillations is not constant, varying throughout the plot. There doesn’t appear to be any clear increasing or decreasing trend over time, and the oscillations seem irregular, suggesting random variability with occasional extreme values. Further investigation could help determine whether the extreme values represent anomalies or are part of a natural pattern. For the most part, values in the graph are contained within $\pm 3$.
 
 #### 4. Plot for Series D
 
@@ -105,7 +105,7 @@ series_d
 
 Comment on the features:
 
-The time series plot for `Series D` shows an oscillating pattern similar to the previous series, with values for the most part fluctuating around zero. One notable feature is that the amplitude of the oscillations varies over time, with more prominent peaks and troughs towards the middle and end of the plot. The series does not exhibit any clear upward or downward trend and remains centered around zero, indicating it may be stationary. The fluctuations appear somewhat more irregular than in some of the other series, with no consistent pattern in the timing of the peaks and troughs. There is a slight tendency for larger downward fluctuations towards the end of the series.
+The time series plot for `Series D` shows an oscillating pattern similar to the previous series, with values for the most part fluctuating around zero. One notable feature is that the amplitude of the oscillations varies over time, with more prominent peaks and troughs towards the middle and end of the plot. The series does not exhibit any clear upward or downward trend and remains centered around zero, indicating it may be stationary. The fluctuations appear somewhat more irregular than in some of the other series, with no consistent pattern in the timing of the peaks and troughs. There is a slight tendency for larger downward fluctuations towards the end of the series (index $> \approx 215$), with values more likely to be under $0$ than not. All values in this plot are contained within $\pm 3$.
 
 ### B. Use the PACF to identify AR model, illustrate the reasons of your choice and evaluate the goodness of your model through the `tsdiag` function
 
@@ -148,7 +148,7 @@ ar_series_A <- Arima(data$Series.A, order = c(4, 0, 0))
 tsdiag(ar_series_A)
 ```
 
-**Standardized Residuals**: This plot display residuals that fluctuate randomly around zero with no obvious patterns or trends. In our model, the residuals appear to fluctuate randomly around zero, with no significant patterns, trends, or autocorrelation evident. Overall, the residuals are well-behaved which suggests that the AR(4) model is capturing most of the structure of time series data. It is possible that AR(1), AR(2), or AR(3) could also work.
+**Standardized Residuals**: This plot display residuals that fluctuate randomly around zero with no obvious patterns or trends. In our model, the residuals appear to fluctuate randomly around zero, with no significant patterns, trends, or autocorrelation evident. Overall, the residuals are well-behaved which suggests that the AR(4) model is capturing most of the structure of time series data.
 
 **ACF of Residuals:** The autocorrelation of residuals shows no significant spikes, as all lags fall within the confidence bounds. This is a good sign, indicating that the residuals do not have significant autocorrelation and are close to white noise. It means the model has adequately captured the time-dependent structure of the series.
 
@@ -184,7 +184,7 @@ tsdiag(ar_series_B)
 pacf(data$Series.C, main = "PACF of Series C")
 ```
 
-**Comment:** According to the PACF plot for Series C, the partial autocorrelations at lags 1, 2, 3, and 4 are significantly different from zero at the 5% significance level. While there are marginally under-significant values at lags 7, 12, and 17. However these may be due to noise or randomness rather than meaningful patterns. The PACF shows a general decrease after lag 4, which suggests that an AR(4) model could capture the main structure of the data without making the model overly complex. Therefore, we choose an AR(4) model as it provides a balance between model complexity and fit, with the main cut-off occurring at lag 4.
+**Comment:** According to the PACF plot for Series C, the partial autocorrelations at lags 1, 2, 3, and 4 are significantly different from zero at the 5% significance level. There are marginally under-significant values at lags 7, 12, and 17, which are possibly due to noise or randomness. The PACF shows a noticeable decrease after lag 4, which suggests that an AR(4) model could capture the main structure of the data without making the model overly complex. Therefore, we choose an AR(4) model as it provides a balance between model complexity and fit, with the main cut-off occurring at lag 4.
 
 ```{r}
 # Fit the AR(4) model to time series C
@@ -207,7 +207,7 @@ tsdiag(ar_series_C)
 pacf(data$Series.D, main = "PACF of Series D")
 ```
 
-Comment: According to the PACF plot for Series D, the partial autocorrelations at lags 1, 2, 3, and 6 are significantly different from zero at the 5% significance level. There is a marginally significant value at lag 19, which may be due to noise or randomness. The PACF shows a general decrease after lag 6, which suggests that an AR(6) model could capture the main structure of the data without making the model overly complex. Therefore, we choose an AR(6) model.
+Comment: According to the PACF plot for Series D, the partial autocorrelations at lags 1, 2, 3, and 6 are significantly different from zero at the 5% significance level. There is a marginally significant value at lag 19, which may be due to noise or randomness. The PACF shows a general decrease after lag 6, which suggests that an AR(6) model could capture the main structure of the data without making the model overly complex. Therefore, we choose an AR(6) model. An alternative could be an AR(1) or AR(3) model, depending on how complex we want the model to be.
 
 ```{r}
 # Fit the AR(4) model to time series C
