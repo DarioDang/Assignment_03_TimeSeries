@@ -291,7 +291,7 @@ acf(data$Series.C, main = "ACF of Series C")
 Comment: There is a significant spike at lag 1 that exceeds the confidence bounds, indicating that there is strong autocorrelation at this lag. After lag 1, the autocorrelation values quickly diminish, with subsequent lags mostly within the confidence bounds. The small and insignificant autocorrelation values at lag 8 and lag 13, suggest that there might be some white noise. Hence, the ACF shows a sharp cut - off at lag 1, this suggest the MA(1) is likely appropriate. There is also a cyclical pattern in the ACF.
 
 ```{r}
-# Fit the MA(1) model to time series C
+# Fit the MA(2) model to time series D
 ma_series_C <- Arima(data$Series.C, order = c(0, 0, 1))
 
 # Perform diagnostics using tsdiag
@@ -313,7 +313,7 @@ Based on the diagnostic check, the MA(1) model seems to be a good fit for Series
 acf(data$Series.D, main = "ACF of Series D")
 ```
 
-Comment: According to the ACF plot for time series D, the autocorrelations at lags 1 and 2 are significantly different from zero at the 5% significance level. After lag 2, the ACF values drops close to zero, indicating no significant autocorrelation at further lags. While there are some minor spikes at lags 6, 17, and 18, barely above or just under the lines of significance, these are likely due to noise or randomness in the data and do not suggest any meaningful structure. The sharp cut-off in the ACF after lag 2 suggests that an MA(2) model is appropriate for this series, as it can capture the main structure of the data.
+Comment: According to the ACF plot for time series D, the autocorrelations at lags 1 and 2 are significantly different from zero at the 5% significance level. After lag 2, the ACF values drops close to zero, indicating no significant autocorrelation at further lags. While there are some minor spikes at lags 6, 17, and 18, barely above or just under the lines of significance, these are likely some autocorrelation pattern in these lags need to further investigate. The sharp cut-off in the ACF after lag 2 suggests that an MA(2) model is appropriate for this series, as it can capture the main structure of the data.
 
 ```{r}
 # Fit the MA(2) model to time series D
@@ -327,15 +327,15 @@ tsdiag(ma_series_D)
 
 **ACF of Residuals:** The ACF plot shows no significant autocorrelations remaining, as all values fall within the confidence bounds. While there are small spikes at lags 6 and 18, these values remain within the confidence limits and likely result from random fluctuations or noise. They are unlikely to affect the model significantly but are worth noting for potential further investigation.
 
-**Ljung - Box p - values:** The p-values are mostly above the 0.05 threshold for all lags, there are a few lags show slightly lower p-values (closer to the 0.05 mark), but they are still above the threshold. Therefore, we fail to reject the null hypothesis that there is no autocorrelation in the residuals.
+**Ljung - Box p - values:** The p-values are mostly above the 0.05 threshold for all lags, there are a few lags show slightly lower p-values (closer to the 0.05 mark), but they are still above the threshold. This indicate model capture all the autocorrelation and the spikes at lag 6 and 18 is some random noise. Therefore, we fail to reject the null hypothesis that there is no autocorrelation in the residuals.
 
 Based on the diagnostic check, the MA(2) model seems to be a good fit for Series D.
 
 ## Question 02
 
-### A. Identify a suitable ARMA for Series A
+### A. Identify ARMA Series A
 
-#### A.1 Try with ARMA(1,0,0) model
+#### A.1 Try with ARMA(1,0) model
 
 ```{r}
 # Fit the model with AR(1)
@@ -349,11 +349,11 @@ tsdiag(arma_100_model_seriesA)
 
 **ACF of Residuals:** The ACF plot shows no significant autocorrelations remaining, as all values fall within the confidence bounds. While there are small spikes at lags 2, 3 and 9, these values remain within the confidence limits and likely result from random noise.
 
-**Ljung - Box p - values:** According to the p values for Ljung - Box statistic, most of p-values at certain lags (1,3,5,7,9,10) fall below the 0.05 significant level. This means that we reject the null hypothesis that there is no autocorrelation in the residuals, indicating that there is significant autocorrelation in the residuals at these lags.
+**Ljung - Box p - values:** According to the p values for Lijung - Box statistic, most of p-values at certain lags (1,3,5,7,9,10) fall below the 0.05 significant level. This means that we reject the null hypothesis that there is no autocorrelation in the residuals, indicating that there is significant autocorrelation in the residuals at these lags.
 
 As a result, ARMA(1,0,0) may not fully capture the underlying autocorrelation structure of the time series indicate this is not a best fit model for this series.
 
-#### A.2 Try with ARMA(2,0,0) model
+#### A.2 Try with ARMA(2,0) model
 
 ```{r}
 # Fit the model with ARMA(2,0,0)
@@ -371,7 +371,7 @@ tsdiag(arma_200_model_seriesA)
 
 As a result, this model might fit well to the data but some notice at lag 9 might be need to further investigate.
 
-#### A.3 Try with ARMA(1,0,1) model
+#### A.3 Try with ARMA(1,1) model
 
 ```{r}
 # Fit the model with AR(1)
@@ -389,7 +389,7 @@ tsdiag(arma_101_model_seriesA)
 
 Therefore, ARMA(1,0,1) is not an adequate model for this time series since not capture all pattern of data.
 
-#### A.4 Try with ARMA(1,0,2) model
+#### A.4 Try with ARMA(1,2) model
 
 ```{r}
 # Fit the model with AR(1,0,2)
@@ -407,7 +407,7 @@ tsdiag(arma_102_model_seriesA)
 
 Therefore, ARMA(1,0,2) is represented as an adequate model for this series.
 
-#### A.5 Try with ARMA(0,0,1) model
+#### A.5 Try with ARMA(0,1) model
 
 ```{r}
 # Fit the model with AR(0,0,1)
@@ -425,7 +425,7 @@ tsdiag(arma_001_model_seriesA)
 
 The ARMA(0,0,1) model is not a good fit for this time series, as there is still significant autocorrelation in the residuals which the model cannot capture.
 
-#### A.6 Try with ARMA(0,0,2) model
+#### A.6 Try with ARMA(0,2) model
 
 ```{r}
 # Fit the model with AR(0,0,2)
@@ -443,7 +443,7 @@ tsdiag(arma_002_model_seriesA)
 
 The ARMA(0,0,2) model is not a good fit for this time series, as there is still significant autocorrelation in the residuals which the model cannot capture.
 
-#### A.7 Try with ARMA(2,0,1) model
+#### A.7 Try with ARMA(2,1) model
 
 ```{r}
 # Fit the model with AR(2,0,1)
@@ -461,7 +461,7 @@ tsdiag(arma_201_model_seriesA)
 
 This suggest that the ARMA(2,0,1) is an adequate model for this series but the p values at lag 9 just slightly above the line, hence, ARMA(2,0,2) might get a better result in this case.
 
-#### A.8 Try with ARMA(2,0,2) model
+#### A.8 Try with ARMA(2,2) model
 
 ```{r}
 # Fit the model with AR(2,0,1)
@@ -531,11 +531,11 @@ summary(arma_202_model_seriesA)
 
 The ARMA(2,0,2) model for the time series indicates that the current value is influenced by both past values and past forecast errors. The AR(1) (-1.6181) and AR(2) (-0.6846) terms suggest an inverse relationship with the values at lag 1 and lag 2, meaning that if the previous values were high, the current value is likely to be lower. The MA(1) (0.8915) and MA(2) (0.2601) terms show that errors from the previous two periods positively affect the current value, with a stronger impact from the most recent error. The model effectively balances these influences, and with low AIC (719.21) and RMSE (1.0527) values, it fits the data well.
 
-### B. Identify a suitable ARMA for Series B
+### B. Identify ARMA Series B
 
 Since we have define the AR(4) and MA(1) is suitable for this time series as above now we test with the combination of AR and MA to see whether it perform a better fit. Since the AR(4) is out of the range of p and q (0,1,2). Therefore, we can try the MA(2) to see whether it have better performance.
 
-#### B.1 Try with ARMA(0,0,2) model
+#### B.1 Try with ARMA(0,2) model
 
 ```{r}
 # Fit the model with ARMA(1,0,1)
@@ -555,7 +555,7 @@ As a result, ARMA(0,0,2) seem to be an adequate model for this time series.
 
 Let look at the combination of AR and MA
 
-#### B.1 Try with ARMA(1,0,1) model
+#### B.1 Try with ARMA(1,1) model
 
 ```{r}
 # Fit the model with ARMA(1,0,1)
@@ -573,7 +573,7 @@ tsdiag(arma_101_model_seriesB)
 
 As a result, ARMA(1,0,1) seem to be an adequate model for this series.
 
-#### B.2 Try with ARMA(1,0,2) model
+#### B.2 Try with ARMA(1,2) model
 
 ```{r}
 # Fit the model with ARMA(1,0,2)
@@ -591,7 +591,7 @@ tsdiag(arma_102_model_seriesB)
 
 As a result, ARMA(1,0,2) seem to be an adequate model for this series.
 
-#### B.3 Try with ARMA(2,0,1) model
+#### B.3 Try with ARMA(2,1) model
 
 ```{r}
 # Fit the model with ARMA(1,0,1)
@@ -609,7 +609,7 @@ tsdiag(arma_201_model_seriesB)
 
 As a result, ARMA(2,0,1) seem to be an adequate model for this series.
 
-#### B.4 Try with ARMA(2,0,2) model
+#### B.4 Try with ARMA(2,2) model
 
 ```{r}
 # Fit the model with ARMA(2,0,2)
@@ -754,9 +754,9 @@ series_C_aic_values %>%
                 full_width = F, position = "center")
 ```
 
-### D. Identify a suitable ARMA for Series D
+### D. Identify ARMA Series D
 
-#### D.1 Try with ARMA(1,0,1)
+#### D.1 Try with ARMA(1,1)
 
 ```{r}
 # Fit the model with MA(2)
@@ -774,7 +774,7 @@ tsdiag(arma_101_model_seriesD)
 
 The ARMA(1,0,1) model is not a good fit for this time series, as there is still significant autocorrelation in the residuals which the model cannot capture.
 
-#### D.2 Try with ARMA(1,0,2)
+#### D.2 Try with ARMA(1,2)
 
 ```{r}
 # Fit the model with MA(2)
@@ -790,7 +790,7 @@ tsdiag(arma_102_model_seriesD)
 
 **Ljung - Box p - values:** however, the p-values at all lags now above 0.05. Therefore, we fail to reject the null hypothesis that there is no autocorrelation in the residuals. And lag 6 might be some white noise.
 
-#### D.3 Try with ARMA(2,0,1)
+#### D.3 Try with ARMA(2,1)
 
 ```{r}
 # Fit the model with MA(2)
@@ -806,7 +806,7 @@ tsdiag(arma_201_model_seriesD)
 
 **Ljung - Box p - values:** The p-values at all lags now above 0.05. Therefore, we fail to reject the null hypothesis that there is no autocorrelation in the residuals.
 
-#### D.4 Try with ARMA(2,0,2)
+#### D.4 Try with ARMA(2,2)
 
 ```{r}
 # Fit the model with MA(2)
@@ -864,10 +864,7 @@ series_B_aic_values %>%
 
 ### Extracting Time Series and plotting it
 
-Use the library quantmod to extract the daily time series of the share prices of the
-Burberry Group by using the command
-`getSymbols("BB2.BE",from="2015-01-01",to="2024-08-31")`, extract the adjusted
-price and plot it.
+Use the library quantmod to extract the daily time series of the share prices of the Burberry Group by using the command `getSymbols("BB2.BE",from="2015-01-01",to="2024-08-31")`, extract the adjusted price and plot it.
 
 ```{r}
 library(quantmod)
@@ -892,32 +889,36 @@ plot(bb2_adjusted)
 Give a brief explanation of the drop in stock prices as reported by the news.
 :::
 
-- Burberry is a luxury fashion house based in London. (Source: https://en.wikipedia.org/wiki/Burberry)
+-   Burberry is a luxury fashion house based in London. (Source: <https://en.wikipedia.org/wiki/Burberry>)
 
-- Assuming "the drop in stock prices" refers to the recent period of 2023 and beyond, then the reason may be due to the decrease in higher-spending chinese consumers, which are play a large part in purchasing Burberry's goods. 
+-   Assuming "the drop in stock prices" refers to the recent period of 2023 and beyond, then the reason may be due to the decrease in higher-spending chinese consumers, which are play a large part in purchasing Burberry's goods.
 
-- As reported by the news, “The problem clearly is China, which emerged from being a very small player in the luxury goods industry to becoming a massive presence over the last decade or so." (Source: https://www.cnbc.com/2024/09/23/luxury-stocks-slip-as-fears-grow-of-a-prolonged-downturn.html)
+-   As reported by the news, “The problem clearly is China, which emerged from being a very small player in the luxury goods industry to becoming a massive presence over the last decade or so." (Source: <https://www.cnbc.com/2024/09/23/luxury-stocks-slip-as-fears-grow-of-a-prolonged-downturn.html>)
 
 ### Part B
 
 ::: boxTask
-What is an adequate ARMA model for the adjusted price? Produce a tsdiag for
-the chosen model with comment.
+What is an adequate ARMA model for the adjusted price? Produce a tsdiag for the chosen model with comment.
 :::
 
 <!-- ### A note on stationarity -->
 
 <!-- *Note on stationarity:* Looking at the plots above, the data generating process for `bb2_adjusted` is likely non-stationary. This can be seen by the mean of the data varying across different time periods. Considering ARMA models taught by STAT456 are under the assumption that time series are stationary (Lecture Set 09 - AR Models, Slide 2), then ARMA models may not hold particularly well for this dataset as it currently is. Differencing the data may provide a better approximation of a stationary process.  -->
 
-<!-- <!-- Nevertheless, for the purposes of this assignment `bb2_adjusted` will be analysed and modeled rather than `bb2_adjusted_diff`. --> -->
+<!-- <!-- Nevertheless, for the purposes of this assignment `bb2_adjusted` will be analysed and modeled rather than `bb2_adjusted_diff`. -->
+
+--\>
 
 <!-- Running the Augmented Dickey-Fuller (ADF) test, it will be seen that `bb2_adjusted` has a p value of greater than $0.05$, and `bb2_adjusted_diff` has a p-value of less than $0.05$. This is further evidence that the differenced series may be stationary, while the non-differenced series is not. -->
 
-
 <!-- ```{r} -->
+
 <!-- library(tseries) -->
+
 <!-- adf.test(bb2_adjusted) -->
+
 <!-- adf.test(bb2_adjusted_diff) -->
+
 <!-- ``` -->
 
 <!-- Nevertheless, the original (non-differenced) series `bb2_adjusted` will be investigated. This can be justified because a stationary model can be used to model a non-stationary process - it may just not necessarily be an accurate model. -->
@@ -931,9 +932,9 @@ acf(bb2_adjusted, lag.max = 100, main="ACF of BB2.BE adjusted data (daily)")
 pacf(bb2_adjusted, lag.max = 100, main="PACF of BB2.BE adjusted data (daily)")
 ```
 
-- The ACF chart shows significant autocorrelations for all $\texttt{lag} < 100$, all of which are slowly tailing off. This may appear unusual, but could just be a sign that we modeling a non-stationary process. This may also indicate that there is no MA component/there is an AR component.
+-   The ACF chart shows significant autocorrelations for all $\texttt{lag} < 100$, all of which are slowly tailing off. This may appear unusual, but could just be a sign that we modeling a non-stationary process. This may also indicate that there is no MA component/there is an AR component.
 
-- On the other hand, the PACF is significant in the first lag. This is likely a strong indication that there is an AR(1) component. There are some other sparsely distributed significant lags, e.g. $\texttt{lag} = 78$, however these are so far away from the start that it is very likely to just be noise.
+-   On the other hand, the PACF is significant in the first lag. This is likely a strong indication that there is an AR(1) component. There are some other sparsely distributed significant lags, e.g. $\texttt{lag} = 78$, however these are so far away from the start that it is very likely to just be noise.
 
 Both of these facts suggests that an ARMA($1$,$0$) model is appropriate, i.e. the time series could be modeled as an AR($1$) process. Let's show the `summary()` and `tsdiag()` for the first 4 AR processes starting at 0 to confirm:
 
@@ -955,11 +956,11 @@ summary(model_ar1)
 tsdiag(model_ar1)
 ```
 
-The AR($1$) model appears to be a decent fit: 
+The AR($1$) model appears to be a decent fit:
 
-  (i) There are no clear ACFs above the line of significance (apart from the trivial lag $0$), 
-  (ii) the standardized residuals approximately look like white noise, and 
-  (iii) the p values for the Ljung-Box statistic are all above the line of significance, showing that we can fail to reject the null hypothesis that there is autocorrelation in the residuals. The AIC value is $2213.18$. 
+(i) There are no clear ACFs above the line of significance (apart from the trivial lag $0$),
+(ii) the standardized residuals approximately look like white noise, and
+(iii) the p values for the Ljung-Box statistic are all above the line of significance, showing that we can fail to reject the null hypothesis that there is autocorrelation in the residuals. The AIC value is $2213.18$.
 
 ##### AR(2)
 
@@ -979,7 +980,7 @@ summary(model_ar3)
 tsdiag(model_ar3)
 ```
 
-As above, but the AIC is now $2216.33$. This increasing AIC may indicate that we are starting to overfit on the data. 
+As above, but the AIC is now $2216.33$. This increasing AIC may indicate that we are starting to overfit on the data.
 
 ##### Conclusion
 
@@ -1000,8 +1001,7 @@ Interestingly, auto.arima() returns an ARMA($0,5$) model (i.e. MA($5$)). This ha
 ## Part C
 
 ::: boxTask
-Use the xts library to transoform the daily adjusted prices from the previous
-question to a monthly close series and plot it.
+Use the xts library to transoform the daily adjusted prices from the previous question to a monthly close series and plot it.
 :::
 
 ```{r}
@@ -1025,9 +1025,9 @@ acf(monthly_close, main="ACF of Monthly Close Prices")
 pacf(monthly_close, main="PACF of Monthly Close Prices")
 ```
 
-- Again, the ACF shows a high and slowly decreasing autocorrelation. This likely indicates an AR(p) process.
+-   Again, the ACF shows a high and slowly decreasing autocorrelation. This likely indicates an AR(p) process.
 
-- The PACF has a (very) significant first lag, as with the daily graph. This indicates an AR($1$) process, where the stock price one month ago can give information about the current stock price. There are also significant lags at lag $6$ and $13$. It is unclear whether these lags are very meaningful, given the data only spans 10 years.  Nevertheless, these models can be investigated: AR(1), AR(6), and AR(13).
+-   The PACF has a (very) significant first lag, as with the daily graph. This indicates an AR($1$) process, where the stock price one month ago can give information about the current stock price. There are also significant lags at lag $6$ and $13$. It is unclear whether these lags are very meaningful, given the data only spans 10 years. Nevertheless, these models can be investigated: AR(1), AR(6), and AR(13).
 
 ##### AR(1)
 
@@ -1037,15 +1037,15 @@ summary(model_month_ar1)
 tsdiag(model_month_ar1, gof.lag=13)
 ```
 
-- The standardized residuals plot does not appear like white noise. In particular, the variance appears small in the beginning of the plot compared to the end. Towards the end, there is also a clear negative bias in the residuals.
+-   The standardized residuals plot does not appear like white noise. In particular, the variance appears small in the beginning of the plot compared to the end. Towards the end, there is also a clear negative bias in the residuals.
 
-- Most ACF of the residuals are within the lines of significance, with a couple of exceptions (lag $5$ and lag $12$). This is happening more than chance ($\frac{1}{20}$ given a p-value of $0.05$) which means this is likely not just noise.
+-   Most ACF of the residuals are within the lines of significance, with a couple of exceptions (lag $5$ and lag $12$). This is happening more than chance ($\frac{1}{20}$ given a p-value of $0.05$) which means this is likely not just noise.
 
-- All the p-values for the Ljung-Box statistic are above the line of significance. This means that we fail to reject the null hypothesis that the residuals are independently distributed. In other words, there is no significant evidence of autocorrelation in the residuals up to all the lags tested. Note that this result somewhat contradicts the observation on the standardized residuals.
+-   All the p-values for the Ljung-Box statistic are above the line of significance. This means that we fail to reject the null hypothesis that the residuals are independently distributed. In other words, there is no significant evidence of autocorrelation in the residuals up to all the lags tested. Note that this result somewhat contradicts the observation on the standardized residuals.
 
-- The sole coefficient $\texttt{ar1}$ is $0.9193$. This shows that there is a correlation by the time series and itself (at $\texttt{lag}=1$) by this amount. This is very easy to intepret.
+-   The sole coefficient $\texttt{ar1}$ is $0.9193$. This shows that there is a correlation by the time series and itself (at $\texttt{lag}=1$) by this amount. This is very easy to intepret.
 
-- The AIC is $450.38$.
+-   The AIC is $450.38$.
 
 ##### AR(6)
 
@@ -1057,10 +1057,10 @@ tsdiag(model_month_ar6)
 
 With the AR ($6$) model:
 
-- The standardized residuals look mostly the same,
-- The ACF is significant only for lag $12$.
-- The p-values are very high, which means we can fail to reject the hypothesis that the residuals are independently distributed.
-- The highest coefficient is the first one ($\texttt{ar1} = 0.9977$). Coefficients $\texttt{ar2}, \texttt{ar3},$ and $\texttt{ar4}$ are not significant (the coefficient value is contained within $2 \times \texttt{s.e.}$). Coefficient $\texttt{ar5}$ is $0.2912$ and significant, and coefficient $\texttt{ar6}$ is $-0.26$ as well as significant.
+-   The standardized residuals look mostly the same,
+-   The ACF is significant only for lag $12$.
+-   The p-values are very high, which means we can fail to reject the hypothesis that the residuals are independently distributed.
+-   The highest coefficient is the first one ($\texttt{ar1} = 0.9977$). Coefficients $\texttt{ar2}, \texttt{ar3},$ and $\texttt{ar4}$ are not significant (the coefficient value is contained within $2 \times \texttt{s.e.}$). Coefficient $\texttt{ar5}$ is $0.2912$ and significant, and coefficient $\texttt{ar6}$ is $-0.26$ as well as significant.
 
 The AIC is lower, at $449.09$. Even though the AIC is lower, AR($1$) may still be the more sensible model because it is simpler (parsimony, as it has less autoregressive terms).
 
@@ -1072,19 +1072,16 @@ summary(model_month_ar13)
 tsdiag(model_month_ar13)
 ```
 
-These results for the AR($13$) graphs look similar to the AR($6$) graphs only mildly improving them. The AIC is also worse than both AR($6$) and AR($1$), being at $457.56$ which suggests this model is not optimal compared to them. 
+These results for the AR($13$) graphs look similar to the AR($6$) graphs only mildly improving them. The AIC is also worse than both AR($6$) and AR($1$), being at $457.56$ which suggests this model is not optimal compared to them.
 
 Thus, the most sensible model is possibly AR($1$).
 
 ### Part E
 
 ::: boxTask
-STAT456 and ECON614 students should also comment on the different models
-for the daily series and the monthly series.
+STAT456 and ECON614 students should also comment on the different models for the daily series and the monthly series.
 :::
-
 
 ```{r}
 # TODO MANUAL
 ```
-
