@@ -23,12 +23,6 @@ library(quantmod)
 library(kableExtra)
 ```
 
-**Ljung-Box Test Interpretation:**
-
-**If the point is above the line:** We fail to reject the null hypothesis that there is no autocorrelation in the residuals.
-
-**If the point is below the line:** we reject the null hypothesis that there is no autocorrelation in the residuals, indicating that there is significant autocorrelation in the residuals at these lags.
-
 ## Question 01
 
 ```{r}
@@ -773,6 +767,8 @@ series_C_aic_values %>%
 Excluding Auto_Arima, ARMA(0,1) had the third lowest AIC. Surprisingly, ARMA(0,2) and ARMA(1,1) had better AIC terms.
 
 ### D. Identify ARMA Series D
+
+**TODO**
 
 #### D.1 Try with ARMA(1,1)
 
