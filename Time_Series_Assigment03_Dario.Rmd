@@ -291,7 +291,7 @@ acf(data$Series.C, main = "ACF of Series C")
 Comment: There is a significant spike at lag 1 that exceeds the confidence bounds, indicating that there is strong autocorrelation at this lag. After lag 1, the autocorrelation values quickly diminish, with subsequent lags mostly within the confidence bounds. The small and insignificant autocorrelation values at lag 8 and lag 13, suggest that there might be some white noise. Hence, the ACF shows a sharp cut - off at lag 1, this suggest the MA(1) is likely appropriate. There is also a cyclical pattern in the ACF.
 
 ```{r}
-# Fit the MA(2) model to time series D
+# Fit the MA(1) model to time series C
 ma_series_C <- Arima(data$Series.C, order = c(0, 0, 1))
 
 # Perform diagnostics using tsdiag
@@ -333,7 +333,7 @@ Based on the diagnostic check, the MA(2) model seems to be a good fit for Series
 
 ## Question 02
 
-### A. Identify ARMA Series A
+### A. Identify a suitable ARMA for Series A
 
 #### A.1 Try with ARMA(1,0,0) model
 
@@ -349,7 +349,7 @@ tsdiag(arma_100_model_seriesA)
 
 **ACF of Residuals:** The ACF plot shows no significant autocorrelations remaining, as all values fall within the confidence bounds. While there are small spikes at lags 2, 3 and 9, these values remain within the confidence limits and likely result from random noise.
 
-**Ljung - Box p - values:** According to the p values for Lijung - Box statistic, most of p-values at certain lags (1,3,5,7,9,10) fall below the 0.05 significant level. This means that we reject the null hypothesis that there is no autocorrelation in the residuals, indicating that there is significant autocorrelation in the residuals at these lags.
+**Ljung - Box p - values:** According to the p values for Ljung - Box statistic, most of p-values at certain lags (1,3,5,7,9,10) fall below the 0.05 significant level. This means that we reject the null hypothesis that there is no autocorrelation in the residuals, indicating that there is significant autocorrelation in the residuals at these lags.
 
 As a result, ARMA(1,0,0) may not fully capture the underlying autocorrelation structure of the time series indicate this is not a best fit model for this series.
 
@@ -531,7 +531,7 @@ summary(arma_202_model_seriesA)
 
 The ARMA(2,0,2) model for the time series indicates that the current value is influenced by both past values and past forecast errors. The AR(1) (-1.6181) and AR(2) (-0.6846) terms suggest an inverse relationship with the values at lag 1 and lag 2, meaning that if the previous values were high, the current value is likely to be lower. The MA(1) (0.8915) and MA(2) (0.2601) terms show that errors from the previous two periods positively affect the current value, with a stronger impact from the most recent error. The model effectively balances these influences, and with low AIC (719.21) and RMSE (1.0527) values, it fits the data well.
 
-### B. Identify ARMA Series B
+### B. Identify a suitable ARMA for Series B
 
 Since we have define the AR(4) and MA(1) is suitable for this time series as above now we test with the combination of AR and MA to see whether it perform a better fit. Since the AR(4) is out of the range of p and q (0,1,2). Therefore, we can try the MA(2) to see whether it have better performance.
 
@@ -676,83 +676,46 @@ summary(arma_002_model_seriesB)
 
 The ARMA(0,0,2) model for series B indicates that the current value is influenced by the errors from the previous two periods. The MA1 coefficient (0.5061) shows a moderate positive impact from the error at lag 1, meaning that a positive error in the previous step increases the current value. The MA2 coefficient (-0.0997) indicates a weaker, slightly negative influence from the error at lag 2, but its effect is minimal. The small positive mean (0.0613) suggests the series fluctuates around a slightly positive level. With low AIC (682.75) and RMSE (0.9861), the model appears to fit the data well, capturing the key dynamics of the time series effectively.
 
-### C. Identify ARMA Series C
+### C. Identify a suitable ARMA for Series C
 
-Since we have define the AR(4) and MA(1) is suitable for this time series as mentioned above now we test with the combination of AR and MA to see whether it perform a better fit.
+From question 1 we have identified that an AR(4)/MA(1) model could be suitable for this time series. Let's start with an MA(1) = ARMA(0,1) model and make successive adjustments by modeling the residuals.
 
-#### C.1 Try with ARMA(1,0,1)
-
-```{r}
-# Fit the model with AR(2)
-arma_101_model_seriesC <- Arima(data$Series.C, order = c(1, 0, 1))
-
-# Evaluate the model 
-tsdiag(arma_101_model_seriesC)
-```
-
-S**tandardized Residuals:** The residuals fluctuate randomly around zero with no clear patterns or trends which is a good sign indicate that model has captured structure of data.
-
-**ACF of Residuals:** The ACF plot shows no significant autocorrelations as most of all values fall within the confidence bounds.
-
-**Ljung - Box p - values:** The p-values for the Ljung-Box test are consistently above 0.05 for all lags, which indicates that we fail to reject the null hypothesis that there is no autocorrelation in the residuals.
-
-As a result, ARMA(1,0,1) might be an adequate model for this time series
-
-#### C.2 Try with ARMA(1,0,2)
+#### C.1 ARMA(0,1)
 
 ```{r}
-# Fit the model with MA(2)
-arma_102_model_seriesC <- Arima(data$Series.C, order = c(1, 0, 2))
+# Fit the model with ARMA(0,1)
+arma_01_model_seriesC <- Arima(data$Series.C, order = c(0, 0, 1))
 
 # Evaluate the model 
-tsdiag(arma_102_model_seriesC)
+tsdiag(arma_01_model_seriesC)
 ```
 
-**Standardized Residuals:** The residuals fluctuate randomly around zero with no clear patterns or trends which is a good sign indicate that model has captured structure of data.
+The residuals appear to be white noise, although there might be a slight cyclical pattern. The ACF shows only significance for lag 8 (likely due to noise), and the Ljung-Box statistic is above the line of significance for all lags. This suggests that the residuals are likely white noise, thus an ARMA(0,1) model appears to be a good fit. Let's try plotting a PACF of the residuals to see if adding an AR component could be beneficial.
 
-**ACF of Residuals:** The ACF plot shows no significant autocorrelations as most of all values fall within the confidence bounds.
-
-**Ljung - Box p - values:** The p-values for the Ljung-Box test are consistently above 0.05 for all lags, which indicates that we fail to reject the null hypothesis that there is no autocorrelation in the residuals.
-
-As a result, ARMA(1,0,2) might be an adequate model for this time series
-
-#### C.3 Try with ARMA(2,0,1)
 
 ```{r}
-# Fit the model with MA(2)
-arma_201_model_seriesC <- Arima(data$Series.C, order = c(2, 0, 1))
-
-# Evaluate the model 
-tsdiag(arma_201_model_seriesC)
+pacf(arma_01_model_seriesC$residuals)
 ```
 
-**Standardized Residuals:** The residuals fluctuate randomly around zero with no clear patterns or trends which is a good sign indicate that model has captured structure of data.
+The PACF of the residuals shows a lag very close to the line of significance at lag = 8.  However, given we are limited to p = 0, 1, and 2 the purposes of the assignment, it does not appear that adding an AR component with these low p values would benefit the model.
 
-**ACF of Residuals:** The ACF plot shows no significant autocorrelations as most of all values fall within the confidence bounds.
+As adding an AR component does not appear beneficial, Let's now try subtracting one from the MA component to make an ARMA(0,0) white noise model to see if it will still lead to a good fit.
 
-**Ljung - Box p - values:** The p-values for the Ljung-Box test are consistently above 0.05 for all lags, which indicates that we fail to reject the null hypothesis that there is no autocorrelation in the residuals.
-
-As a result, ARMA(1,0,2) might be an adequate model for this time series
-
-#### C.4 Try with ARMA(2,0,2)
+#### C.2 ARMA(0,0)
 
 ```{r}
-# Fit the model with MA(2)
-arma_202_model_seriesC <- Arima(data$Series.C, order = c(2, 0, 2))
+# Fit the model with ARMA(0,0)
+arma_00_model_seriesC <- Arima(data$Series.C, order = c(0, 0, 0))
 
 # Evaluate the model 
-tsdiag(arma_202_model_seriesC)
+tsdiag(arma_00_model_seriesC)
 ```
 
-**Standardized Residuals:** The residuals fluctuate randomly around zero with no clear patterns or trends which is a good sign indicate that model has captured structure of data.
-
-**ACF of Residuals:** The ACF plot shows no significant autocorrelations as most of all values fall within the confidence bounds.
-
-**Ljung - Box p - values:** The p-values for the Ljung-Box test are consistently above 0.05 for all lags, which indicates that we fail to reject the null hypothesis that there is no autocorrelation in the residuals.
-
-As a result, ARMA(2,0,2) might be an adequate model for this time series
+The ACF plot shows significance at lag 1 indicating the original ARMA(0,1) model was the right choice. Furthermore, all the p-values for the Ljung-Box statistic are below 0, which means that we can reject the null hypothesis that there is no significant autocorrelation for the residuals for these lags. This all points to ARMA(0,0) being a poor model for this time series. The original ARMA(0,1) model is likely a good fit. Increasing the MA component by one to an ARMA(0,2) model may lead to overfitting, considering the residuals for ARMA(0,1) already approximate white noise. It is better to keep the simpler model here.
 
 #### C.5 Try Auto Arima for series C
+
+Let's now compare ARMA(0,1) with the one provided by `auto.arima()`.
 
 ```{r}
 # Compare with auto.arima
@@ -761,36 +724,37 @@ auto_arima_seriesC <- auto.arima(data$Series.C)
 # show the result 
 auto_arima_seriesC
 ```
+`auto.arima()` provides an ARMA(2,4) model.
 
 #### Model Selection
 
 ```{r}
 # Compare the AIC from each model 
-aic_arma400_seriesC <- ar_series_C$aic
-aic_arma001_seriesC <- ma_series_C$aic
-aic_arma101_seriesC <- arma_101_model_seriesC$aic
-aic_arma102_seriesC <- arma_102_model_seriesC$aic
-aic_arma201_seriesC <- arma_201_model_seriesC$aic
-aic_arma202_seriesC <- arma_202_model_seriesC$aic
+aic_arma00_seriesC <- Arima(data$Series.C, order = c(0, 0, 0))$aic
+aic_arma01_seriesC <- Arima(data$Series.C, order = c(0, 0, 1))$aic
+aic_arma11_seriesC <- Arima(data$Series.C, order = c(1, 0, 1))$aic
+aic_arma12_seriesC <- Arima(data$Series.C, order = c(1, 0, 2))$aic
+aic_arma21_seriesC <- Arima(data$Series.C, order = c(2, 0, 1))$aic
+aic_arma22_seriesC <- Arima(data$Series.C, order = c(2, 0, 2))$aic
 aic_auto_arima_seriesC <- auto_arima_seriesC$aic
 ```
 
 ```{r}
 # Create a data frame for the AIC values
 series_C_aic_values <- data.frame(
-  Model = c("ARMA(4,0,0)","ARMA(0,0,1)","ARMA(1,0,1)", "ARMA(1,0,2)", "ARMA(2,0,1)", "ARMA(2,0,2)", "Auto_Arima"),
-  AIC = c(aic_arma400_seriesC,aic_arma001_seriesC,aic_arma101_seriesC, aic_arma102_seriesC, aic_arma201_seriesC,
-           aic_arma202_seriesC, aic_auto_arima_seriesC)
+  Model = c("ARMA(0,0)","ARMA(0,1)","ARMA(1,1)", "ARMA(1,2)", "ARMA(2,1)", "ARMA(2,2)", "Auto_Arima"),
+  AIC = c(aic_arma00_seriesC,aic_arma01_seriesC,aic_arma11_seriesC, aic_arma12_seriesC, aic_arma21_seriesC,
+           aic_arma22_seriesC, aic_auto_arima_seriesC)
 )
 
 # Use kableExtra to create a formatted table
-series_B_aic_values %>%
+series_C_aic_values %>%
   kable("html", caption = "Model Comparison") %>%
   kable_styling(bootstrap_options = c("striped", "hover"),
                 full_width = F, position = "center")
 ```
 
-### D. Identify ARMA Series D
+### D. Identify a suitable ARMA for Series D
 
 #### D.1 Try with ARMA(1,0,1)
 
