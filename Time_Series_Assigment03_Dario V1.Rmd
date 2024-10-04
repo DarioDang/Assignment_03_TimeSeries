@@ -383,7 +383,7 @@ tsdiag(arma_21_model_seriesA)
 
 The diagnostic plots for the ARMA(2,1) model show that the standardized residuals fluctuate randomly around zero, with no clear patterns, indicating that the model has captured the structure of the time series. The ACF of residuals plot shows no significant autocorrelations, as all values fall within the confidence bounds, suggesting that the residuals behave like white noise. Finally, the Ljung-Box test p-values are mostly above the 0.05 significance level across the lags, further confirming that there is no evidence of autocorrelation in the residuals. Based on these diagnostics, the ARMA(2,1) model seems to fit the data well, and the addition of the AR(2) component was justified, as it has resolved the previously unaccounted-for autocorrelation. However, there is a small spike at lag 9 which might indicate some autocorrelation pattern that the model can not capture there. Hence, we try to add 1 more value to MA component to see whether it can capture the information at this lag.
 
-#### A.9 Try with ARMA(2,2)
+#### A.9 Try with ARMA(2,2) model
 
 ```{r}
 # Fit the model with ARMA(2,1)
