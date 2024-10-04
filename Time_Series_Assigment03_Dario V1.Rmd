@@ -327,7 +327,7 @@ Based on the diagnostic check, the MA(2) model seems to be a good fit for Series
 
 ## Question 02
 
-### A. Identify suitable ARMA for series A 
+### A. Identify suitable ARMA for series A
 
 From question 1 we have identified that an AR(4)/MA(8) model could be suitable for this time series. Let's start with an MA(1) = ARMA(0,1) model and make successive adjustments by modeling the residuals.
 
@@ -448,7 +448,7 @@ summary(arma_202_model_seriesA)
 
 The ARMA(2,2) model for the time series indicates that the current value is influenced by both past values and past forecast errors. The AR(1) (-1.6181) and AR(2) (-0.6846) terms suggest an inverse relationship with the values at lag 1 and lag 2, meaning that if the previous values were high, the current value is likely to be lower. The MA(1) (0.8915) and MA(2) (0.2601) terms show that errors from the previous two periods positively affect the current value, with a stronger impact from the most recent error. The model effectively balances these influences, and with low AIC (719.21) and RMSE (1.0527) values, it fits the data well.
 
-### B. Identify suitable ARMA  for Series B
+### B. Identify suitable ARMA for Series B
 
 Since we have define the AR(4) and MA(1) is suitable for this time series as above now we test with the combination of AR and MA to see whether it perform a better fit. Since the AR(4) is out of the range of p and q (0,1,2). Therefore, we can try the MA(2) to see whether it have better performance.
 
@@ -486,7 +486,7 @@ tsdiag(arma_01_model_seriesB)
 
 The diagnostic plots for the ARMA(0,1) model show that the standardized residuals fluctuate randomly around zero, with no clear patterns, indicating that the model has captured the structure of the time series. The ACF of residuals plot shows no significant autocorrelations, as all values fall within the confidence bounds. Finally, the Ljung-Box test p-values are above the 0.05 significance level across the lags, further confirming that we fail to reject the null hypothesis that there is no significant autocorrelation for the residuals for these lags. Based on these diagnostics, the ARMA(0,1) model seems to fit the data well.
 
-#### B.2 Try with Auto Arima 
+#### B.2 Try with Auto Arima
 
 ```{r}
 # Compare with auto.arima
@@ -496,7 +496,7 @@ auto_arima_seriesB <- auto.arima(data$Series.B)
 auto_arima_seriesB
 ```
 
-Similar to what we have discuss, auto arima also suggest the ARMA(0,2) with have the lowest AIC (681.22) emphasize that ARMA(2,2) seem to be an adequate model for this series. However, to make it more clear, we try to with different ARMA model and look for the lowest AIC.
+Similar to what we have discuss, auto arima also suggest the ARMA(0,2) with have the lowest AIC (681.22) emphasize that ARMA(0,2) seem to be an adequate model for this series. However, to make it more clear, we try to with different ARMA model and look for the lowest AIC.
 
 ```{r}
 # Compare the AIC from each model 
@@ -557,7 +557,7 @@ The residuals appear to be white noise, although there might be a slight cyclica
 pacf(arma_01_model_seriesC$residuals)
 ```
 
-The PACF of the residuals shows a lag very close to the line of significance at lag = 8. However, given we are limited to $0 \leq p  \leq 2$ for the purposes of the assignment, it does not appear that adding an AR component with these low p values would benefit the model.
+The PACF of the residuals shows a lag very close to the line of significance at lag = 8. However, given we are limited to $0 \leq p \leq 2$ for the purposes of the assignment, it does not appear that adding an AR component with these low p values would benefit the model.
 
 As adding an AR component does not appear beneficial, Let's experiment by subtracting one from the MA component to make an ARMA(0,0) white noise model to see if it will still lead to a good fit.
 
