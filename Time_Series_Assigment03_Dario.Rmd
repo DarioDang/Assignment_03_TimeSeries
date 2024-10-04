@@ -708,7 +708,7 @@ series_D_aic_values %>%
 
 Exclusing Auto_Arima, ARMA(0,2) had the third lowest AIC out of the possible options at 676.6. The lowest was ARMA(2,1) at 674.5. This suggests that ARMA(0,2) was a good overall fit but there were other options in the search space that were optimal.
 
-It is interesting to note that the Auto_Arima ARMA(0,3) model had an AIC score higher than ARMA(2,1). This shows that it is not reliable in finding the lowest AIC score, and it possibly doing something else to find its 'best' model apart from a brute-force search. 
+It is interesting to note that the Auto_Arima ARMA(0,3) model had an AIC score higher than ARMA(2,1). This shows that `auto.arima` does not necessarily find the lowest AIC score, and it possibly doing something else to find its 'best' model apart from a brute-force AIC-minimization search. 
 
 ## Question 03
 
@@ -733,7 +733,7 @@ plot(bb2_adjusted)
 
 -   Burberry is a luxury fashion house based in London. (Source: <https://en.wikipedia.org/wiki/Burberry>)
 
--   Assuming "the drop in stock prices" refers to the recent period of 2023 and beyond, then the reason may be due to the decrease in higher-spending chinese consumers, which are play a large part in purchasing Burberry's goods.
+-   Assuming "the drop in stock prices" refers to the recent period of 2023 and beyond, then the reason may be due to a **decrease in higher-spending Chinese consumers, which are play a large part in purchasing Burberry's goods**. 
 
 -   As reported by the news, “The problem clearly is China, which emerged from being a very small player in the luxury goods industry to becoming a massive presence over the last decade or so." (Source: <https://www.cnbc.com/2024/09/23/luxury-stocks-slip-as-fears-grow-of-a-prolonged-downturn.html>)
 
@@ -820,9 +820,13 @@ As above, but the AIC is now $2216.33$. This increasing AIC may indicate that we
 
 ##### Conclusion
 
-Having run the above `summary` and `tsdiag`s of AR($0$) to AR($3$), it appears that ARMA($1$, $0$) = AR($1$) fits `bb2_adjusted` the best. The coefficients are
+Having run the above `summary` and `tsdiag`s of AR($0$) to AR($3$), it appears that ARMA($1$, $0$) = AR($1$) fits `bb2_adjusted` the best. 
 
-**TODO**
+```{r}
+model_ar1$coef
+```
+
+The ar1 coefficient is 0.996, which is very high. This means that each point likely shares a similar value to the point before it. The series is very, very likely not stationary. Note that this value is very similar to the the first lag shown on the PACF plot.
 
 #### auto.arima()
 
@@ -861,7 +865,7 @@ pacf(monthly_close, main="PACF of Monthly Close Prices")
 
 -   Again, the ACF shows a high and slowly decreasing autocorrelation. This likely indicates an AR(p) process.
 
--   The PACF has a (very) significant first lag, as with the daily graph. This indicates an AR($1$) process, where the stock price one month ago can give information about the current stock price. There are also significant lags at lag $6$ and $13$. It is unclear whether these lags are very meaningful, given the data only spans 10 years. Nevertheless, these models can be investigated: AR(1), AR(6), and AR(13).
+-   The PACF has a (very) significant first lag, as with the daily graph. This indicates an AR($1$) process, where the stock price one month ago can give information about the current stock price. There are also significant lags at lag $6$ and $13$. It is unclear whether these lags are meaningful, given the data only spans 10 years. However, considering the data is monthly, $6$ represents half a year, and $13$ is very close to $12$, there might be some annual/biannual effect. Thus, the following models will be investigated: AR(1), AR(6), and AR(13).
 
 ##### AR(1)
 
@@ -894,9 +898,9 @@ With the AR ($6$) model:
 -   The standardized residuals look mostly the same,
 -   The ACF is significant only for lag $12$.
 -   The p-values are very high, which means we can fail to reject the hypothesis that the residuals are independently distributed.
--   The highest coefficient is the first one ($\texttt{ar1} = 0.9977$). Coefficients $\texttt{ar2}, \texttt{ar3},$ and $\texttt{ar4}$ are not significant (the coefficient value is contained within $2 \times \texttt{s.e.}$). Coefficient $\texttt{ar5}$ is $0.2912$ and significant, and coefficient $\texttt{ar6}$ is $-0.26$ as well as significant.
+-   The highest coefficient is the first one ($\texttt{ar1} = 0.9977$). The other coefficients vary between -0.26 to 0.29, showing a mild effect. Note that coefficients $\texttt{ar2}, \texttt{ar3},$ and $\texttt{ar4}$ are not significant (the coefficient value is contained within $2 \times \texttt{s.e.}$).
 
-The AIC is lower, at $449.09$. Even though the AIC is lower, AR($1$) may still be the more sensible model because it is simpler (parsimony, as it has less autoregressive terms).
+The AIC is lower, at $449.09$. Even though the AIC is lower, AR($1$) may still be the more sensible model because it is simpler (parsimony, as it has less autoregressive terms), and it is very clear that most of explainability in the model comes from the first component.
 
 ##### AR(13)
 
@@ -912,10 +916,23 @@ Thus, the most sensible model is possibly AR($1$).
 
 ### E. Comment on difference between daily and monthly models
 
-::: boxTask
-STAT456 and ECON614 students should also comment on the different models for the daily series and the monthly series.
-:::
+AR(1) was chosen for both the daily as well as the monthly series.
 
-```{r}
-# TODO MANUAL
-```
+#### Coefficients
+
+- Recall that for the daily AR(1) model, the ar1 coefficient was: $0.996$.
+- While for the monthly AR(1) model, the ar1 coefficient was: $0.919$.
+
+This means that the value of each day has a very high correlation to the value of the previous day. While the value for each month has "just" a high correlation to the previous month.
+
+#### Significant Lags under ACF
+
+- For the daily AR(1) model, the only significant lag was the trivial lag ($0$).
+- For the monthly AR(1) model, there were also significant lags in lag 6 and 13.
+
+This means that the monthly series is better able to pick up this "longer term" (i.e. biannual) information, whereas in the daily time series such long term behaviour would be much more difficult to find: the number of lags charted would be inconveniently high.
+
+#### Other Comments
+
+- The monthly series smoothed out variability in the daily data.
+- While the AIC is smaller (~450) for the monthly data compared to the daily data (~2200), comparing these AIC values would not be fair since the data underlying each model is different. 
