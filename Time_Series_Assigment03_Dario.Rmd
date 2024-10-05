@@ -332,11 +332,12 @@ Based on the diagnostic check, the MA(2) model seems to be a good fit for Series
 
 ## Question 02
 
-### A. Identify suitable ARMA for series A 
+### A. Identify suitable ARMA for series A
 
 From question 1 we have identified that an AR(4)/MA(8) model could be suitable for this time series. Let's start with an MA(1) = ARMA(0,1) model and make successive adjustments by modeling the residuals.
 
 #### A.1 Try with ARMA(0,1) model
+
 ```{r}
 # Fit the model with ARMA(0,1)
 arma_01_model_seriesA <- Arima(data$Series.A, order = c(0, 0, 1))
@@ -380,9 +381,11 @@ auto_arima_seriesA <- auto.arima(data$Series.A)
 # show the result 
 auto_arima_seriesA
 ```
+
 Similar to what we have discussed, `auto.arima` also suggests the ARMA(2,2) model with the lowest AIC (717.22) emphasize that ARMA(2,2) seems to be an adequate model for this series. To confirm this, we try with different ARMA models and look for the lowest AIC.
 
 #### A.4 Comparing AIC
+
 ```{r}
 # Compare the AIC from each model 
 aic_arma00_seriesA <- Arima(data$Series.A, order = c(0, 0, 0))$aic
@@ -410,8 +413,7 @@ series_A_aic_values %>%
                 full_width = F, position = "center")
 ```
 
-We used AIC to compared different ARIMA model, based on the table ARMA(2,2) has the lowest AIC this emphasize that this model has captured all of the autocorrelation pattern and leave the white noise on the residual. Hence, it performs as an adequate model for this particular time series.
-In order to interpret the model we extract the coefficients of ARMA(2,2)
+We used AIC to compared different ARIMA model, based on the table ARMA(2,2) has the lowest AIC this emphasize that this model has captured all of the autocorrelation pattern and leave the white noise on the residual. Hence, it performs as an adequate model for this particular time series. In order to interpret the model we extract the coefficients of ARMA(2,2)
 
 ```{r}
 # Extract the coefficient of ARMA(2,2)
@@ -420,7 +422,7 @@ summary(arma_22_model_seriesA)
 
 The ARMA(2,2) model for the time series indicates that the current value is influenced by both the past 2 values and the past 2 forecast errors. The AR(1) (-1.6181) and AR(2) (-0.6846) terms suggest that if the previous values are positive, the current value will be negative and vice versa (inverse). The MA(1) (0.8915) and MA(2) (0.2601) terms show that errors from the previous two periods positively affect the current value, with a stronger impact from the most recent error. The model effectively balances these influences, and with low AIC (719.21) and RMSE (1.0527) values, it fits the data well.
 
-### B. Identify suitable ARMA  for Series B
+### B. Identify suitable ARMA for Series B
 
 Since we have shown AR(4)/MA(1) are potentially suitable for series, we now test a combination of AR and MA to see whether they perform a good fit. Since the AR(4) is out of the range of p and q (0,1,2), we can try MA(2)=ARMA(0,2) to see whether it has good performance.
 
@@ -441,8 +443,7 @@ Let's try plotting a PACF of the residuals to see if adding an AR component coul
 pacf(arma_02_model_seriesB$residuals)
 ```
 
-The **PACF plot** of the residuals for the **ARMA(0,2)** model shows that all the partial autocorrelations fall within the confidence bounds. This indicates that there is no significant autocorrelation remaining in the residuals, suggesting that the model has adequately captured the underlying structure of the time series. Since the partial autocorrelations at all lags are within the confidence bounds, there is no strong indication that an additional AR component is needed. The residuals appear to behave like white noise, which is the goal of a well-fitted time series model.
-Let compare with ARMA(0,1) to see if removing an MA component still leaves us with a good model
+The **PACF plot** of the residuals for the **ARMA(0,2)** model shows that all the partial autocorrelations fall within the confidence bounds. This indicates that there is no significant autocorrelation remaining in the residuals, suggesting that the model has adequately captured the underlying structure of the time series. Since the partial autocorrelations at all lags are within the confidence bounds, there is no strong indication that an additional AR component is needed. The residuals appear to behave like white noise, which is the goal of a well-fitted time series model. Let compare with ARMA(0,1) to see if removing an MA component still leaves us with a good model
 
 #### B.2 Try with Arima (0,1) model
 
@@ -455,7 +456,7 @@ tsdiag(arma_01_model_seriesB)
 
 The diagnostic plots for the ARMA(0,1) model show that the standardized residuals fluctuate randomly around zero, with no obvious patterns. The ACF of residuals plot shows no significant autocorrelations, as all values fall within the confidence bounds. Finally, the Ljung-Box test p-values are above the 0.05 significance level across the lags, further confirming that we fail to reject the null hypothesis that there is no significant autocorrelation for the residuals for these lags. Based on these diagnostics, the ARMA(0,1) model seems to fit the data well.
 
-#### B.2 Try with Auto Arima 
+#### B.2 Try with Auto Arima
 
 ```{r}
 # Compare with auto.arima
@@ -504,7 +505,7 @@ summary(arma_02_model_seriesB)
 
 The ARMA(0,2) model for series B indicates that the current value is influenced by the errors from the previous two periods. The MA1 coefficient (0.5061) shows a moderate positive impact from the error at lag 1, meaning that a positive error in the previous step increases the current value. The MA2 coefficient (-0.0997) indicates a weaker, slightly negative influence from the error at lag 2, but its effect is minimal. With low AIC (682.75) and RMSE (0.9861), the model appears to fit the data well, capturing the key dynamics of the time series effectively.
 
-### C. Identify suitable ARMA  for Series C
+### C. Identify suitable ARMA for Series C
 
 From question 1 we have identified that an AR(4)/MA(1) model could be suitable for this time series. Let's start with an MA(1) = ARMA(0,1) model and make successive adjustments by modeling the residuals.
 
@@ -520,12 +521,11 @@ tsdiag(arma_01_model_seriesC)
 
 The residuals appear to be white noise, although there might be a slight cyclical pattern. The ACF shows only significance for lag 8 (likely due to noise), and the Ljung-Box statistic is above the line of significance for all lags. This suggests that the residuals are likely white noise, thus an ARMA(0,1) model appears to be a good fit. Let's try plotting a PACF of the residuals to see if adding an AR component could be beneficial.
 
-
 ```{r}
 pacf(arma_01_model_seriesC$residuals)
 ```
 
-The PACF of the residuals shows a lag very close to the line of significance at lag = 8.  However, given we are limited to $0 \leq p  \leq 2$ for the purposes of the assignment, it does not appear that adding an AR component with these low p values would benefit the model.
+The PACF of the residuals shows a lag very close to the line of significance at lag = 8. However, given we are limited to $0 \leq p \leq 2$ for the purposes of the assignment, it does not appear that adding an AR component with these low p values would benefit the model.
 
 As adding an AR component does not appear beneficial, Let's experiment by subtracting one from the MA component to make an ARMA(0,0) white noise model to see if it will still lead to a good fit.
 
@@ -539,7 +539,7 @@ arma_00_model_seriesC <- Arima(data$Series.C, order = c(0, 0, 0))
 tsdiag(arma_00_model_seriesC)
 ```
 
-The ACF plot shows significance at lag 1 indicating the original ARMA(0,1) model was the right choice. Furthermore, all the p-values for the Ljung-Box statistic are below 0, which means that we can reject the null hypothesis that there is no significant autocorrelation for the residuals for these lags. This all suggests that the ARMA(0,0) white noise model is a poor one for this time series. The original ARMA(0,1) model is a better fit. 
+The ACF plot shows significance at lag 1 indicating the original ARMA(0,1) model was the right choice. Furthermore, all the p-values for the Ljung-Box statistic are below 0, which means that we can reject the null hypothesis that there is no significant autocorrelation for the residuals for these lags. This all suggests that the ARMA(0,0) white noise model is a poor one for this time series. The original ARMA(0,1) model is a better fit.
 
 Considering the residuals for ARMA(0,1) already approximate white noise fairly well. Increasing the MA component by one to an ARMA(0,2) model may lead to overfitting. By being parsimonious, it is better to keep the simpler ARMA(0,1) model.
 
@@ -600,7 +600,7 @@ series_C_aic_values %>%
 
 Excluding Auto_Arima, ARMA(0,1) had the third lowest AIC. Surprisingly, ARMA(0,2) and ARMA(1,1) had better AIC terms. Nevertheless, ARMA(0,1) is still the simplest, which may be one reason to use it.
 
-### D. Identify suitable ARMA  for Series D
+### D. Identify suitable ARMA for Series D
 
 From question 1 we have identified that an AR(6)/MA(2) model could be suitable for this time series. Let's start with the MA(2) = ARMA(0,2) model and make successive adjustments by modeling the residuals.
 
@@ -635,6 +635,7 @@ arma_01_model_seriesD <- Arima(data$Series.D, order = c(0, 0, 1))
 # Evaluate the model 
 tsdiag(arma_01_model_seriesD)
 ```
+
 ARMA(0,1) does not appear to be a good fit. Many Ljung-box p values are under the line of significance, indicating that we can reject the null hypothesis that there is no autocorrelation between the lags. Furthermore, the ACF is significant at lag 2, indicating that adding back an MA(2) component will be worthwhile. Thus, the ARMA(0,2) model is the best so far.
 
 #### D.3 ARMA(1,2)
@@ -708,7 +709,7 @@ series_D_aic_values %>%
 
 Exclusing Auto_Arima, ARMA(0,2) had the third lowest AIC out of the possible options at 676.6. The lowest was ARMA(2,1) at 674.5. This suggests that ARMA(0,2) was a good overall fit but there were other options in the search space that were optimal.
 
-It is interesting to note that the Auto_Arima ARMA(0,3) model had an AIC score higher than ARMA(2,1). This shows that `auto.arima` does not necessarily find the lowest AIC score, and it possibly doing something else to find its 'best' model apart from a brute-force AIC-minimization search. 
+It is interesting to note that the Auto_Arima ARMA(0,3) model had an AIC score higher than ARMA(2,1). This shows that `auto.arima` does not necessarily find the lowest AIC score, and it possibly doing something else to find its 'best' model apart from a brute-force AIC-minimization search.
 
 ## Question 03
 
@@ -733,7 +734,7 @@ plot(bb2_adjusted)
 
 -   Burberry is a luxury fashion house based in London. (Source: <https://en.wikipedia.org/wiki/Burberry>)
 
--   Assuming "the drop in stock prices" refers to the recent period of 2023 and beyond, then the reason may be due to a **decrease in higher-spending Chinese consumers, which are play a large part in purchasing Burberry's goods**. 
+-   Assuming "the drop in stock prices" refers to the recent period of 2023 and beyond, then the reason may be due to a **decrease in higher-spending Chinese consumers, which are play a large part in purchasing Burberry's goods**.
 
 -   As reported by the news, “The problem clearly is China, which emerged from being a very small player in the luxury goods industry to becoming a massive presence over the last decade or so." (Source: <https://www.cnbc.com/2024/09/23/luxury-stocks-slip-as-fears-grow-of-a-prolonged-downturn.html>)
 
@@ -820,7 +821,7 @@ As above, but the AIC is now $2216.33$. This increasing AIC may indicate that we
 
 ##### Conclusion
 
-Having run the above `summary` and `tsdiag`s of AR($0$) to AR($3$), it appears that ARMA($1$, $0$) = AR($1$) fits `bb2_adjusted` the best. 
+Having run the above `summary` and `tsdiag`s of AR($0$) to AR($3$), it appears that ARMA($1$, $0$) = AR($1$) fits `bb2_adjusted` the best.
 
 ```{r}
 model_ar1$coef
@@ -848,7 +849,7 @@ monthly_close <- monthly_data$bb2_adjusted.Close
 plot(monthly_close, main="Monthly Close Prices of BB2.BE (Burberry Group)")
 ```
 
-### D. Suitable ARMA model for monthly 
+### D. Suitable ARMA model for monthly
 
 ::: boxTask
 Identify a suitable ARMA model for the monthly close prices and verify its adequacy with `tsdiag`.
@@ -863,9 +864,7 @@ acf(monthly_close, main="ACF of Monthly Close Prices")
 pacf(monthly_close, main="PACF of Monthly Close Prices")
 ```
 
--   Again, the ACF shows a high and slowly decreasing autocorrelation. This likely indicates an AR(p) process.
-
--   The PACF has a (very) significant first lag, as with the daily graph. This indicates an AR($1$) process, where the stock price one month ago can give information about the current stock price. There are also significant lags at lag $6$ and $13$. It is unclear whether these lags are meaningful, given the data only spans 10 years. However, considering the data is monthly, $6$ represents half a year, and $13$ is very close to $12$, there might be some annual/biannual effect. Thus, the following models will be investigated: AR(1), AR(6), and AR(13).
+-   Again, the ACF shows a high and slowly decreasing autocorrelation, while the PACF has a (very) significant first lag and sharply cut off after that, as with the daily graph. This indicates an AR($1$) process, where the stock price one month ago can give information about the current stock price. There are also significant lags at lag $6$ and $13$. It is unclear whether these lags are meaningful, given the data only spans 10 years. However, considering the data is monthly, $6$ represents half a year, and $13$ is very close to $12$, there might be some annual/biannual effect. Thus, the following models will be investigated: AR(1), AR(6), and AR(13).
 
 ##### AR(1)
 
@@ -920,19 +919,19 @@ AR(1) was chosen for both the daily as well as the monthly series.
 
 #### Coefficients
 
-- Recall that for the daily AR(1) model, the ar1 coefficient was: $0.996$.
-- While for the monthly AR(1) model, the ar1 coefficient was: $0.919$.
+-   Recall that for the daily AR(1) model, the ar1 coefficient was: $0.996$.
+-   While for the monthly AR(1) model, the ar1 coefficient was: $0.919$.
 
 This means that the value of each day has a very high correlation to the value of the previous day. While the value for each month has "just" a high correlation to the previous month.
 
 #### Significant Lags under ACF
 
-- For the daily AR(1) model, the only significant lag was the trivial lag ($0$).
-- For the monthly AR(1) model, there were also significant lags in lag 6 and 13.
+-   For the daily AR(1) model, the only significant lag was the trivial lag ($0$).
+-   For the monthly AR(1) model, there were also significant lags in lag 6 and 13.
 
 This means that the monthly series is better able to pick up this "longer term" (i.e. biannual) information, whereas in the daily time series such long term behaviour would be much more difficult to find: the number of lags charted would be inconveniently high.
 
 #### Other Comments
 
-- The monthly series smoothed out variability in the daily data.
-- While the AIC is smaller (~450) for the monthly data compared to the daily data (~2200), comparing these AIC values would not be fair since the data underlying each model is different. 
+-   The monthly series smoothed out variability in the daily data.
+-   While the AIC is smaller (\~450) for the monthly data compared to the daily data (\~2200), comparing these AIC values would not be fair since the data underlying each model is different.
